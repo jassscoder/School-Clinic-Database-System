@@ -1,5 +1,5 @@
 <?php
-$conn = new mysqli("localhost", "root", "", "schord_db");
+$conn = new mysqli("sql100.infinityfree.com", "if0_41606413", "sfjTodwktf", "if0_41606413_schord_db");
 
 if ($conn->connect_error) {
     die("Database Connection failed: " . $conn->connect_error);
