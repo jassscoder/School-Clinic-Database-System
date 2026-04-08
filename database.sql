@@ -1,7 +1,3 @@
--- Create database
-CREATE DATABASE IF NOT EXISTS schord_db;
-USE schord_db;
-
 -- Create users table
 CREATE TABLE IF NOT EXISTS users (
     id INT AUTO_INCREMENT PRIMARY KEY,
