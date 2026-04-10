@@ -1,7 +1,15 @@
 <?php
-// Database Configuration - Support both Railway and Local environments
-if (getenv('MYSQLHOST')) {
-    // Railway Production Environment
+// Database Configuration - prefer MYSQL_PUBLIC_URL, then Railway private vars, then local
+if ($url = getenv('MYSQL_PUBLIC_URL')) {
+    // MYSQL_PUBLIC_URL contains full connection string: mysql://user:pass@host:port/db
+    $parts = parse_url($url);
+    $db_host = $parts['host'] ?? 'localhost';
+    $db_user = $parts['user'] ?? 'root';
+    $db_password = $parts['pass'] ?? '';
+    $db_name = isset($parts['path']) ? ltrim($parts['path'], '/') : 'schord_db';
+    $db_port = $parts['port'] ?? 3306;
+} elseif (getenv('MYSQLHOST')) {
+    // Railway private environment variables
     $db_host = getenv('MYSQLHOST');
     $db_user = getenv('MYSQLUSER');
     $db_password = getenv('MYSQLPASSWORD');
