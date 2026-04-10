@@ -64,15 +64,15 @@ $recent_visits = $conn->query("SELECT cv.*, s.name as student_name, s.student_no
     <div class="card">
         <h2>🚀 Quick Actions</h2>
         <div class="grid" style="margin-top: 2rem;">
-            <a href="pages/students.php" class="btn" style="text-align: center; text-decoration: none;">
+            <a href="../pages/students.php" class="btn" style="text-align: center; text-decoration: none;">
                 <div style="font-size: 2rem; margin-bottom: 0.5rem;">👥</div>
                 Manage Students
             </a>
-            <a href="pages/visits.php" class="btn" style="text-align: center; text-decoration: none;">
+            <a href="../pages/visits.php" class="btn" style="text-align: center; text-decoration: none;">
                 <div style="font-size: 2rem; margin-bottom: 0.5rem;">📝</div>
                 Record Visit
             </a>
-            <a href="pages/health_records.php" class="btn" style="text-align: center; text-decoration: none;">
+            <a href="../pages/health_records.php" class="btn" style="text-align: center; text-decoration: none;">
                 <div style="font-size: 2rem; margin-bottom: 0.5rem;">📋</div>
                 Health Records
             </a>
@@ -108,7 +108,7 @@ $recent_visits = $conn->query("SELECT cv.*, s.name as student_name, s.student_no
                                 </span>
                             </td>
                             <td>
-                                <a href="pages/visits.php?edit=<?php echo $visit['id']; ?>" class="action-link action-edit">Edit</a>
+                                <a href="../pages/visits.php?edit=<?php echo $visit['id']; ?>" class="action-link action-edit">Edit</a>
                             </td>
                         </tr>
                     <?php endwhile; ?>
@@ -117,7 +117,7 @@ $recent_visits = $conn->query("SELECT cv.*, s.name as student_name, s.student_no
         <?php else: ?>
             <div class="empty-state">
                 <p>No recent visits recorded</p>
-                <a href="visits.php" class="btn">Record First Visit</a>
+                <a href="../pages/visits.php" class="btn">Record First Visit</a>
             </div>
         <?php endif; ?>
     </div>
