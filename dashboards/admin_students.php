@@ -1,4 +1,5 @@
 <?php
+header('Content-Type: text/html; charset=utf-8');
 include '../config/db.php';
 requireLogin();
 
@@ -84,6 +85,14 @@ if (isset($_GET['edit'])) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Manage Students - Admin</title>
     <style>
+        /* Hide any stray CSS text that might appear */
+        body::before,
+        body::after,
+        .container::before,
+        .container::after {
+            display: none !important;
+        }
+        
         * { margin: 0; padding: 0; box-sizing: border-box; }
         :root {
             --primary: #6366f1;

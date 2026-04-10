@@ -1,4 +1,5 @@
 <?php
+header('Content-Type: text/html; charset=utf-8');
 include '../config/db.php';
 requireLogin();
 
@@ -101,105 +102,256 @@ $students = $conn->query("SELECT id, name, student_no FROM students ORDER BY nam
 
         :root {
             --primary: #0891b2;
+            --primary-light: #06b6d4;
             --primary-dark: #0e7490;
-            --secondary: #06b6d4;
+            --accent: #00d9ff;
+            --accent-light: #22d3ee;
             --success: #10b981;
             --warning: #f59e0b;
             --danger: #ef4444;
+            --info: #3b82f6;
             --dark: #082f49;
+            --darker: #051e2a;
             --text-dark: #0c2340;
             --text-light: #64748b;
-            --bg-light: #f8fbff;
+            --text-lighter: #94a3b8;
+            --bg-light: #ecf9ff;
+            --bg-lighter: #cff0f9;
             --bg-card: #ffffff;
-            --shadow: 0 4px 20px rgba(8, 47, 73, 0.08);
+            --bg-hover: #f0f9ff;
+            --border-color: #e0f2fe;
+            --shadow: 0 10px 40px rgba(8, 47, 73, 0.1);
+            --shadow-lg: 0 20px 60px rgba(8, 47, 73, 0.15);
+            --shadow-glow: 0 0 60px rgba(8, 145, 178, 0.15);
         }
 
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+            font-family: 'Inter', 'Segoe UI', system-ui, sans-serif;
+            background: linear-gradient(135deg, #ecf9ff 0%, #cff0f9 50%, #e0f9ff 100%);
             color: var(--text-dark);
             min-height: 100vh;
+            letter-spacing: -0.3px;
         }
 
+        body.dark-mode {
+            background: linear-gradient(135deg, #051e2a 0%, #082f49 50%, #0f3d52 100%);
+            --bg-light: #164e63;
+            --bg-lighter: #0f3d52;
+            --bg-card: #082f49;
+            --bg-hover: #0f4555;
+            --border-color: #0e7490;
+            --text-dark: #ecf9ff;
+            --text-light: #cbd5e1;
+            --text-lighter: #94a3b8;
+        }
+
+        /* ===== SIDEBAR ===== */
         .sidebar {
             position: fixed;
             left: 0;
             top: 0;
-            width: 260px;
+            width: 280px;
             height: 100vh;
-            background: linear-gradient(180deg, var(--dark) 0%, var(--primary-dark) 100%);
+            background: linear-gradient(135deg, var(--darker) 0%, var(--dark) 100%);
             color: white;
             overflow-y: auto;
             z-index: 1000;
-            border-right: 3px solid var(--primary);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            border-right: 1px solid rgba(6, 182, 212, 0.1);
+            box-shadow: 10px 0 40px rgba(0, 0, 0, 0.2);
+            scrollbar-width: thin;
+            scrollbar-color: rgba(6, 182, 212, 0.2) transparent;
+        }
+
+        .sidebar::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .sidebar::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .sidebar::-webkit-scrollbar-thumb {
+            background: rgba(6, 182, 212, 0.2);
+            border-radius: 10px;
+        }
+
+        .sidebar.collapsed {
+            transform: translateX(-280px);
         }
 
         .sidebar-header {
-            padding: 25px 20px;
-            border-bottom: 2px solid rgba(255, 255, 255, 0.15);
+            padding: 30px 25px;
+            border-bottom: 1px solid rgba(6, 182, 212, 0.15);
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 12px;
+            background: linear-gradient(135deg, rgba(6, 182, 212, 0.1) 0%, rgba(0, 217, 255, 0.05) 100%);
         }
 
         .sidebar-header h2 {
-            font-size: 18px;
+            font-size: 20px;
             font-weight: 800;
+            letter-spacing: -0.5px;
+            background: linear-gradient(135deg, #06b6d4 0%, #00d9ff 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .sidebar-logo {
+            font-size: 28px;
+            filter: drop-shadow(0 4px 10px rgba(6, 182, 212, 0.3));
         }
 
         .sidebar-nav {
-            padding: 20px 0;
+            padding: 15px 0;
             list-style: none;
+        }
+
+        .sidebar-nav li {
+            margin: 5px 0;
         }
 
         .sidebar-nav a {
             display: flex;
             align-items: center;
-            gap: 12px;
-            padding: 15px 20px;
-            color: rgba(255, 255, 255, 0.7);
+            gap: 14px;
+            padding: 14px 20px;
+            color: rgba(255, 255, 255, 0.65);
             text-decoration: none;
-            transition: all 0.3s ease;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            font-weight: 500;
+            cursor: pointer;
+            border: none;
+            background: none;
+            text-align: left;
+            width: 100%;
+            font-size: 15px;
+            position: relative;
+            border-left: 3px solid transparent;
+            pointer-events: auto;
+            z-index: 10;
+        }
+
+        .sidebar-nav a::before {
+            content: '';
+            position: absolute;
+            left: -20px;
+            top: 0;
+            bottom: 0;
+            width: 0;
+            background: rgba(6, 182, 212, 0.1);
+            transition: width 0.3s ease;
+            pointer-events: none;
         }
 
         .sidebar-nav a:hover,
         .sidebar-nav a.active {
             color: white;
-            background: rgba(255, 255, 255, 0.1);
-            border-left: 4px solid var(--secondary);
-            padding-left: 16px;
+            background: rgba(6, 182, 212, 0.1);
+            transform: translateX(4px);
         }
 
-        .role-badge {
-            display: inline-block;
-            background: rgba(255, 255, 255, 0.15);
-            padding: 4px 10px;
-            border-radius: 20px;
-            font-size: 11px;
-            font-weight: 700;
-            margin-top: 10px;
-            color: var(--secondary);
+        .sidebar-nav a:hover::before,
+        .sidebar-nav a.active::before {
+            width: 20px;
         }
 
+        .sidebar-nav a.active {
+            border-left-color: var(--accent);
+            text-shadow: 0 0 10px rgba(6, 182, 212, 0.5);
+        }
+
+        .sidebar-nav .icon {
+            font-size: 18px;
+            min-width: 20px;
+            filter: drop-shadow(0 2px 4px rgba(6, 182, 212, 0.2));
+        }
+
+        /* ===== MAIN CONTENT ===== */
         .main-wrapper {
-            margin-left: 260px;
+            margin-left: 280px;
+            transition: margin-left 0.4s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
+        .main-wrapper.sidebar-collapsed {
+            margin-left: 0;
+        }
+
+        /* ===== TOP HEADER ===== */
         .top-header {
-            background: var(--bg-card);
-            border-bottom: 2px solid var(--primary);
-            padding: 20px 30px;
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+            padding: 18px 30px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            box-shadow: var(--shadow);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.06);
             position: sticky;
             top: 0;
             z-index: 100;
+            gap: 20px;
         }
 
+        body.dark-mode .top-header {
+            background: rgba(8, 47, 73, 0.5);
+            border-bottom-color: rgba(6, 182, 212, 0.1);
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .menu-toggle {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: var(--text-dark);
+        }
+
+        .header-title {
+            font-size: 24px;
+            font-weight: 800;
+            color: var(--text-dark);
+            letter-spacing: -0.5px;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .theme-toggle {
+            background: rgba(6, 182, 212, 0.1);
+            border: 1px solid rgba(6, 182, 212, 0.3);
+            border-radius: 10px;
+            width: 44px;
+            height: 44px;
+            cursor: pointer;
+            font-size: 20px;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .theme-toggle:hover {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        /* ===== MAIN CONTENT AREA ===== */
         .main-content {
-            padding: 30px;
+            padding: 35px;
         }
 
         .page-header {
@@ -207,65 +359,109 @@ $students = $conn->query("SELECT id, name, student_no FROM students ORDER BY nam
         }
 
         .page-header h1 {
-            font-size: 32px;
+            font-size: 28px;
             font-weight: 800;
             color: var(--text-dark);
-            margin-bottom: 5px;
+            margin-bottom: 8px;
+            letter-spacing: -0.5px;
         }
 
+        /* ===== STATS GRID ===== */
         .stats-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 20px;
-            margin-bottom: 30px;
+            gap: 22px;
+            margin-bottom: 35px;
         }
 
         .stat-card {
-            background: var(--bg-card);
-            border-radius: 12px;
-            padding: 20px;
-            box-shadow: var(--shadow);
-            border-top: 5px solid var(--primary);
+            background: linear-gradient(135deg, var(--bg-card) 0%, rgba(255, 255, 255, 0.5) 100%);
+            backdrop-filter: blur(10px);
+            border-radius: 16px;
+            padding: 28px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.06);
+            border: 1px solid rgba(255, 255, 255, 0.8);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
         }
 
-        .stat-value {
-            font-size: 32px;
-            font-weight: 800;
-            color: var(--primary);
-            margin-bottom: 5px;
+        body.dark-mode .stat-card {
+            background: linear-gradient(135deg, var(--bg-card) 0%, rgba(8, 47, 73, 0.8) 100%);
+            border-color: rgba(6, 182, 212, 0.1);
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: -50px;
+            right: -50px;
+            width: 150px;
+            height: 150px;
+            background: radial-gradient(circle, rgba(6, 182, 212, 0.15), transparent);
+            border-radius: 50%;
+            z-index: 0;
+        }
+
+        .stat-card::after {
+            content: '';
+            position: absolute;
+            bottom: -50px;
+            left: -50px;
+            width: 100px;
+            height: 100px;
+            background: radial-gradient(circle, rgba(0, 217, 255, 0.1), transparent);
+            border-radius: 50%;
+            z-index: 0;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 16px 48px rgba(6, 182, 212, 0.2);
+            border-color: rgba(6, 182, 212, 0.2);
         }
 
         .stat-label {
             font-size: 13px;
             color: var(--text-light);
+            font-weight: 600;
+            letter-spacing: 0.5px;
             text-transform: uppercase;
-            font-weight: 700;
+            position: relative;
+            z-index: 1;
         }
 
-        .alert {
-            padding: 15px 20px;
-            border-radius: 8px;
-            margin-bottom: 20px;
+        .stat-value {
+            font-size: 36px;
+            font-weight: 800;
+            color: var(--primary);
+            margin: 12px 0 0 0;
+            position: relative;
+            z-index: 1;
+            letter-spacing: -1px;
         }
 
-        .alert-success {
-            background: rgba(16, 185, 129, 0.1);
-            color: var(--success);
-            border-left: 4px solid var(--success);
-        }
-
-        .alert-danger {
-            background: rgba(239, 68, 68, 0.1);
-            color: var(--danger);
-            border-left: 4px solid var(--danger);
-        }
-
+        /* ===== FORM STYLES ===== */
         .form-card {
-            background: var(--bg-card);
-            border-radius: 12px;
-            padding: 25px;
-            margin-bottom: 30px;
-            box-shadow: var(--shadow);
+            background: linear-gradient(135deg, var(--bg-card) 0%, rgba(255, 255, 255, 0.5) 100%);
+            backdrop-filter: blur(10px);
+            border-radius: 16px;
+            padding: 30px;
+            box-shadow: 0 12px 40px rgba(6, 182, 212, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.8);
+            margin-bottom: 35px;
+        }
+
+        body.dark-mode .form-card {
+            background: linear-gradient(135deg, var(--bg-card) 0%, rgba(8, 47, 73, 0.8) 100%);
+            border-color: rgba(6, 182, 212, 0.1);
+        }
+
+        .form-card h2 {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--text-dark);
+            margin-bottom: 20px;
         }
 
         .form-grid {
@@ -291,10 +487,27 @@ $students = $conn->query("SELECT id, name, student_no FROM students ORDER BY nam
         .form-group select,
         .form-group textarea {
             padding: 12px 15px;
-            border: 2px solid var(--bg-light);
+            border: 2px solid rgba(6, 182, 212, 0.2);
             border-radius: 8px;
             color: var(--text-dark);
             font-family: inherit;
+            background: rgba(255, 255, 255, 0.5);
+            transition: all 0.3s ease;
+        }
+
+        body.dark-mode .form-group input,
+        body.dark-mode .form-group select,
+        body.dark-mode .form-group textarea {
+            background: rgba(8, 47, 73, 0.3);
+            border-color: rgba(6, 182, 212, 0.2);
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(6, 182, 212, 0.1);
         }
 
         .form-group textarea {
@@ -302,27 +515,58 @@ $students = $conn->query("SELECT id, name, student_no FROM students ORDER BY nam
             min-height: 100px;
         }
 
+        .alert {
+            padding: 15px 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border-left: 4px solid;
+        }
+
+        .alert-success {
+            background: rgba(16, 185, 129, 0.1);
+            color: var(--success);
+            border-color: var(--success);
+        }
+
+        .alert-danger {
+            background: rgba(239, 68, 68, 0.1);
+            color: var(--danger);
+            border-color: var(--danger);
+        }
+
         .btn {
             padding: 12px 24px;
+            background: linear-gradient(135deg, var(--primary), var(--primary-light));
+            color: white;
             border: none;
             border-radius: 8px;
             font-weight: 600;
             cursor: pointer;
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
-            color: white;
+            transition: all 0.3s ease;
+            font-size: 14px;
+            text-decoration: none;
+            display: inline-block;
         }
 
         .btn:hover {
             transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(8, 145, 178, 0.3);
+            box-shadow: 0 8px 24px rgba(6, 182, 212, 0.3);
         }
 
-        .table-card {
-            background: var(--bg-card);
-            border-radius: 12px;
+        /* ===== TABLE STYLES ===== */
+        .table-wrapper {
+            background: linear-gradient(135deg, var(--bg-card) 0%, rgba(255, 255, 255, 0.5) 100%);
+            backdrop-filter: blur(10px);
+            border-radius: 16px;
+            box-shadow: 0 12px 40px rgba(6, 182, 212, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.8);
             overflow: hidden;
-            box-shadow: var(--shadow);
             margin-top: 20px;
+        }
+
+        body.dark-mode .table-wrapper {
+            background: linear-gradient(135deg, var(--bg-card) 0%, rgba(8, 47, 73, 0.8) 100%);
+            border-color: rgba(6, 182, 212, 0.1);
         }
 
         table {
@@ -331,43 +575,58 @@ $students = $conn->query("SELECT id, name, student_no FROM students ORDER BY nam
         }
 
         thead {
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
-            color: white;
+            background: linear-gradient(135deg, rgba(6, 182, 212, 0.1), rgba(0, 217, 255, 0.05));
+            border-bottom: 2px solid var(--border-color);
+        }
+
+        body.dark-mode thead {
+            background: linear-gradient(135deg, rgba(6, 182, 212, 0.15), rgba(0, 217, 255, 0.08));
         }
 
         th {
             padding: 18px 20px;
             text-align: left;
             font-weight: 700;
+            color: var(--text-dark);
             font-size: 13px;
+            letter-spacing: 0.5px;
             text-transform: uppercase;
         }
 
         td {
-            padding: 15px 20px;
-            border-bottom: 1px solid var(--bg-light);
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--border-color);
+            font-size: 14px;
+        }
+
+        tbody tr {
+            transition: all 0.3s ease;
         }
 
         tbody tr:hover {
-            background: var(--bg-light);
+            background: var(--bg-hover);
+        }
+
+        body.dark-mode tbody tr:hover {
+            background: rgba(6, 182, 212, 0.05);
         }
 
         .status-badge {
             display: inline-block;
-            padding: 6px 14px;
-            border-radius: 20px;
+            padding: 6px 12px;
+            border-radius: 6px;
             font-size: 12px;
-            font-weight: 700;
-            text-transform: uppercase;
+            font-weight: 600;
+            text-transform: capitalize;
         }
 
         .status-ongoing {
-            background: rgba(245, 158, 11, 0.15);
-            color: var(--warning);
+            background: rgba(245, 158, 11, 0.1);
+            color: #d97706;
         }
 
         .status-completed {
-            background: rgba(16, 185, 129, 0.15);
+            background: rgba(16, 185, 129, 0.1);
             color: var(--success);
         }
 
@@ -385,6 +644,7 @@ $students = $conn->query("SELECT id, name, student_no FROM students ORDER BY nam
             font-weight: 600;
             text-decoration: none;
             display: inline-block;
+            transition: all 0.3s ease;
         }
 
         .action-edit {
@@ -398,42 +658,112 @@ $students = $conn->query("SELECT id, name, student_no FROM students ORDER BY nam
         }
 
         .action-btn:hover {
-            opacity: 0.8;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        @media (max-width: 1024px) {
+            .main-content {
+                padding: 25px;
+            }
         }
 
         @media (max-width: 768px) {
-            .sidebar { display: none; }
-            .main-wrapper { margin-left: 0; }
+            .sidebar {
+                display: none;
+            }
+
+            .main-wrapper {
+                margin-left: 0;
+            }
+
+            .menu-toggle {
+                display: flex;
+            }
+
+            .main-content {
+                padding: 20px;
+            }
+
+            .top-header {
+                padding: 15px 20px;
+            }
+
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 15px;
+            }
+
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+
+            table {
+                font-size: 12px;
+            }
+
+            th, td {
+                padding: 10px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .header-right {
+                gap: 10px;
+            }
+
+            .top-header {
+                flex-wrap: wrap;
+            }
+
+            .stat-value {
+                font-size: 28px;
+            }
+
+            .main-content {
+                padding: 15px;
+            }
         }
     </style>
 </head>
 <body>
     <!-- SIDEBAR -->
-    <aside class="sidebar">
+    <aside class="sidebar" id="sidebar">
         <div class="sidebar-header">
-            <span>⚕️</span>
-            <div>
-                <h2>SCHoRD</h2>
-                <span class="role-badge">👩‍⚕️ NURSE</span>
-            </div>
+            <span class="sidebar-logo">👩‍⚕️</span>
+            <h2>SCHoRD</h2>
         </div>
         <ul class="sidebar-nav">
-            <li><a href="../dashboards/nurse_dashboard.php"><span>📊</span> Dashboard</a></li>
-            <li><a href="nurse_patients.php"><span>👥</span> Patients</a></li>
-            <li><a href="nurse_visits.php" class="active"><span>📋</span> Visits</a></li>
-            <li><a href="nurse_health_records.php"><span>❤️</span> Health Records</a></li>
-            <li><a href="nurse_reports.php"><span>📈</span> Reports</a></li>
-            <li style="margin-top: 20px; border-top: 2px solid rgba(255,255,255,0.1); padding-top: 20px;">
-                <a href="../auth/logout.php"><span>🚪</span> Logout</a>
+            <li><a class="sidebar-link" href="../dashboards/nurse_dashboard.php"><span class="icon">📊</span> Dashboard</a></li>
+            <li><a class="sidebar-link" href="nurse_patients.php"><span class="icon">👥</span> Patients</a></li>
+            <li><a class="sidebar-link active" href="nurse_visits.php"><span class="icon">📋</span> Visits</a></li>
+            <li><a class="sidebar-link" href="nurse_health_records.php"><span class="icon">❤️</span> Health Records</a></li>
+            <li><a class="sidebar-link" href="nurse_reports.php"><span class="icon">📈</span> Reports</a></li>
+            <li style="margin-top: 30px; border-top: 1px solid rgba(6, 182, 212, 0.15); padding-top: 20px;">
+                <a class="sidebar-link" href="../auth/logout.php"><span class="icon">🚪</span> Logout</a>
             </li>
         </ul>
     </aside>
 
-    <div class="main-wrapper">
+    <!-- MAIN WRAPPER -->
+    <div class="main-wrapper" id="mainWrapper">
+        <!-- TOP HEADER -->
         <header class="top-header">
-            <h2 style="color: var(--text-dark);">📋 Clinic Visits</h2>
+            <div class="header-left">
+                <button class="menu-toggle" id="menuToggle">☰</button>
+                <h2 class="header-title">📋 Clinic Visits</h2>
+            </div>
+            
+            <div class="header-right">
+                <button class="theme-toggle" id="themeToggle" title="Toggle Dark Mode">🌙</button>
+            </div>
         </header>
 
+        <!-- MAIN CONTENT -->
         <div class="main-content">
             <div class="page-header">
                 <h1>Clinic Visits Management</h1>
@@ -463,14 +793,14 @@ $students = $conn->query("SELECT id, name, student_no FROM students ORDER BY nam
 
             <!-- FORM -->
             <div class="form-card">
-                <h2><?php echo $edit_visit ? 'Edit Visit' : 'Record New Visit'; ?></h2>
+                <h2><?php echo $edit_visit ? '✏️ Edit Visit' : '➕ Record New Visit'; ?></h2>
                 <form method="POST">
                     <div class="form-grid">
                         <div class="form-group">
-                            <label>Student</label>
+                            <label>Student *</label>
                             <select name="student_id" required>
                                 <option value="">Select Student</option>
-                                <?php while ($student = $students->fetch_assoc()): ?>
+                                <?php $students->data_seek(0); while ($student = $students->fetch_assoc()): ?>
                                     <option value="<?php echo $student['id']; ?>" 
                                         <?php echo ($edit_visit && $edit_visit['student_id'] == $student['id']) ? 'selected' : ''; ?>>
                                         <?php echo htmlspecialchars($student['name']) . ' (' . $student['student_no'] . ')'; ?>
@@ -479,7 +809,7 @@ $students = $conn->query("SELECT id, name, student_no FROM students ORDER BY nam
                             </select>
                         </div>
                         <div class="form-group">
-                            <label>Status</label>
+                            <label>Status *</label>
                             <select name="status" required>
                                 <option value="ongoing" <?php echo (!$edit_visit || $edit_visit['status'] == 'ongoing') ? 'selected' : ''; ?>>Ongoing</option>
                                 <option value="completed" <?php echo ($edit_visit && $edit_visit['status'] == 'completed') ? 'selected' : ''; ?>>Completed</option>
@@ -487,11 +817,11 @@ $students = $conn->query("SELECT id, name, student_no FROM students ORDER BY nam
                         </div>
                     </div>
                     <div class="form-group">
-                        <label>Complaint</label>
+                        <label>Complaint *</label>
                         <textarea name="complaint" required><?php echo $edit_visit ? htmlspecialchars($edit_visit['complaint']) : ''; ?></textarea>
                     </div>
                     <div class="form-group">
-                        <label>Treatment</label>
+                        <label>Treatment *</label>
                         <textarea name="treatment" required><?php echo $edit_visit ? htmlspecialchars($edit_visit['treatment']) : ''; ?></textarea>
                     </div>
                     <?php if ($edit_visit): ?>
@@ -502,16 +832,16 @@ $students = $conn->query("SELECT id, name, student_no FROM students ORDER BY nam
             </div>
 
             <!-- TABLE -->
-            <div class="table-card">
+            <div class="table-wrapper">
                 <table>
                     <thead>
                         <tr>
-                            <th>Date</th>
-                            <th>Student</th>
-                            <th>Complaint</th>
-                            <th>Treatment</th>
-                            <th>Status</th>
-                            <th>Actions</th>
+                            <th>📅 Date</th>
+                            <th>👤 Student</th>
+                            <th>🏥 Complaint</th>
+                            <th>💊 Treatment</th>
+                            <th>📊 Status</th>
+                            <th>🔧 Actions</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -524,8 +854,8 @@ $students = $conn->query("SELECT id, name, student_no FROM students ORDER BY nam
                                 <td><span class="status-badge status-<?php echo $visit['status']; ?>"><?php echo ucfirst($visit['status']); ?></span></td>
                                 <td>
                                     <div class="actions">
-                                        <a href="?edit=<?php echo $visit['id']; ?>" class="action-btn action-edit">Edit</a>
-                                        <a href="?delete=<?php echo $visit['id']; ?>" class="action-btn action-delete" onclick="return confirm('Delete?')">Delete</a>
+                                        <a href="?edit=<?php echo $visit['id']; ?>" class="action-btn action-edit">✏️ Edit</a>
+                                        <a href="?delete=<?php echo $visit['id']; ?>" class="action-btn action-delete" onclick="return confirm('Delete?')">🗑️ Delete</a>
                                     </div>
                                 </td>
                             </tr>
@@ -535,5 +865,45 @@ $students = $conn->query("SELECT id, name, student_no FROM students ORDER BY nam
             </div>
         </div>
     </div>
+
+    <script>
+        // Set active nav item based on current page
+        document.addEventListener('DOMContentLoaded', function() {
+            const currentPage = window.location.pathname.split('/').pop();
+            const navLinks = document.querySelectorAll('.sidebar-link');
+            
+            navLinks.forEach(link => {
+                const linkHref = link.getAttribute('href').split('/').pop();
+                if (linkHref === currentPage) {
+                    link.classList.add('active');
+                } else {
+                    link.classList.remove('active');
+                }
+            });
+        });
+
+        // Menu Toggle
+        document.getElementById('menuToggle').addEventListener('click', function(e) {
+            e.stopPropagation();
+            document.getElementById('sidebar').classList.toggle('collapsed');
+            document.getElementById('mainWrapper').classList.toggle('sidebar-collapsed');
+        });
+
+        // Theme Toggle
+        document.getElementById('themeToggle').addEventListener('click', function() {
+            document.body.classList.toggle('dark-mode');
+            const isDark = document.body.classList.contains('dark-mode');
+            localStorage.setItem('theme', isDark ? 'dark' : 'light');
+            this.textContent = isDark ? '☀️' : '🌙';
+        });
+
+        // Load theme preference
+        window.addEventListener('load', function() {
+            if (localStorage.getItem('theme') === 'dark') {
+                document.body.classList.add('dark-mode');
+                document.getElementById('themeToggle').textContent = '☀️';
+            }
+        });
+    </script>
 </body>
 </html>

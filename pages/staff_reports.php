@@ -1,4 +1,5 @@
-<?php
+﻿<?php
+header('Content-Type: text/html; charset=utf-8');
 include '../config/db.php';
 requireLogin();
 
@@ -43,106 +44,231 @@ $top_students = $conn->query("SELECT s.name, COUNT(cv.id) as visit_count FROM st
         }
 
         :root {
-            --primary: #6366f1;
-            --primary-dark: #4f46e5;
-            --secondary: #818cf8;
+            --primary: #10b981;
+            --primary-light: #34d399;
+            --primary-dark: #059669;
+            --accent: #6ee7b7;
+            --accent-light: #a7f3d0;
             --success: #10b981;
             --warning: #f59e0b;
             --danger: #ef4444;
-            --dark: #1e1b4b;
+            --info: #3b82f6;
+            --dark: #064e3b;
+            --darker: #022c1d;
             --text-dark: #1f2937;
-            --text-light: #6b7280;
-            --bg-light: #f3f0ff;
+            --text-light: #64748b;
+            --text-lighter: #94a3b8;
+            --bg-light: #f0fdf4;
+            --bg-lighter: #dcfce7;
             --bg-card: #ffffff;
-            --shadow: 0 4px 20px rgba(99, 102, 241, 0.08);
+            --bg-hover: #ecfdf5;
+            --border-color: #bbf7d0;
+            --shadow: 0 10px 40px rgba(16, 185, 129, 0.1);
+            --shadow-lg: 0 20px 60px rgba(16, 185, 129, 0.15);
         }
 
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #eef2ff 0%, #e0e7ff 100%);
+            font-family: 'Inter', 'Segoe UI', system-ui, sans-serif;
+            background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 50%, #e0fce8 100%);
             color: var(--text-dark);
             min-height: 100vh;
+            letter-spacing: -0.3px;
         }
 
+        body.dark-mode {
+            background: linear-gradient(135deg, #022c1d 0%, #064e3b 50%, #0f5c47 100%);
+            --bg-light: #1b4d3f;
+            --bg-lighter: #0f5c47;
+            --bg-card: #064e3b;
+            --bg-hover: #0d5d4a;
+            --border-color: #047857;
+            --text-dark: #ecfdf5;
+            --text-light: #cbd5e1;
+            --text-lighter: #94a3b8;
+        }
+
+        /* ===== SIDEBAR ===== */
         .sidebar {
             position: fixed;
             left: 0;
             top: 0;
-            width: 260px;
+            width: 280px;
             height: 100vh;
-            background: linear-gradient(180deg, var(--dark) 0%, var(--primary-dark) 100%);
+            background: linear-gradient(135deg, var(--darker) 0%, var(--dark) 100%);
             color: white;
             overflow-y: auto;
             z-index: 1000;
-            border-right: 3px solid var(--primary);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            border-right: 1px solid rgba(16, 185, 129, 0.1);
+            box-shadow: 10px 0 40px rgba(0, 0, 0, 0.2);
+        }
+
+        .sidebar.collapsed {
+            transform: translateX(-280px);
         }
 
         .sidebar-header {
-            padding: 25px 20px;
-            border-bottom: 2px solid rgba(255, 255, 255, 0.15);
+            padding: 30px 25px;
+            border-bottom: 1px solid rgba(16, 185, 129, 0.15);
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 12px;
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.1) 0%, rgba(167, 139, 250, 0.05) 100%);
         }
 
         .sidebar-header h2 {
-            font-size: 18px;
+            font-size: 20px;
             font-weight: 800;
+            background: linear-gradient(135deg, #34d399 0%, #6ee7b7 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .sidebar-logo {
+            font-size: 28px;
+            filter: drop-shadow(0 4px 10px rgba(16, 185, 129, 0.3));
         }
 
         .sidebar-nav {
-            padding: 20px 0;
+            padding: 15px 0;
             list-style: none;
+        }
+
+        .sidebar-nav li {
+            margin: 5px 0;
         }
 
         .sidebar-nav a {
             display: flex;
             align-items: center;
-            gap: 12px;
-            padding: 15px 20px;
-            color: rgba(255, 255, 255, 0.7);
+            gap: 14px;
+            padding: 14px 20px;
+            color: rgba(255, 255, 255, 0.65);
             text-decoration: none;
-            transition: all 0.3s ease;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            font-weight: 500;
+            border: none;
+            background: none;
+            text-align: left;
+            width: 100%;
+            font-size: 15px;
+            position: relative;
+            border-left: 3px solid transparent;
         }
 
         .sidebar-nav a:hover,
         .sidebar-nav a.active {
             color: white;
-            background: rgba(255, 255, 255, 0.1);
-            border-left: 4px solid var(--secondary);
-            padding-left: 16px;
+            background: rgba(16, 185, 129, 0.1);
+            transform: translateX(4px);
         }
 
-        .role-badge {
-            display: inline-block;
-            background: rgba(255, 255, 255, 0.15);
-            padding: 4px 10px;
-            border-radius: 20px;
+        .sidebar-nav a.active {
+            border-left-color: var(--accent);
+        }
+
+        .sidebar-section-label {
             font-size: 11px;
             font-weight: 700;
-            margin-top: 10px;
-            color: var(--secondary);
+            text-transform: uppercase;
+            color: rgba(255, 255, 255, 0.4);
+            margin: 0 20px 10px 20px;
+            letter-spacing: 1px;
+            margin-top: 30px;
+            border-top: 1px solid rgba(16, 185, 129, 0.15);
+            padding-top: 15px;
         }
 
+        .sidebar-section-label:first-of-type {
+            margin-top: 0;
+            border-top: none;
+            padding-top: 0;
+        }
+
+        /* ===== MAIN CONTENT ===== */
         .main-wrapper {
-            margin-left: 260px;
+            margin-left: 280px;
+            transition: margin-left 0.4s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
+        .main-wrapper.sidebar-collapsed {
+            margin-left: 0;
+        }
+
+        /* ===== TOP HEADER ===== */
         .top-header {
-            background: var(--bg-card);
-            border-bottom: 2px solid var(--primary);
-            padding: 20px 30px;
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+            padding: 18px 30px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            box-shadow: var(--shadow);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.06);
             position: sticky;
             top: 0;
             z-index: 100;
+            gap: 20px;
         }
 
+        body.dark-mode .top-header {
+            background: rgba(30, 27, 75, 0.5);
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .menu-toggle {
+            display: none;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            border: none;
+            font-size: 22px;
+            cursor: pointer;
+            color: white;
+            width: 44px;
+            height: 44px;
+            border-radius: 10px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+        }
+
+        .menu-toggle:hover {
+            transform: scale(1.05);
+            box-shadow: 0 8px 20px rgba(16, 185, 129, 0.4);
+        }
+
+        .header-title {
+            font-size: 24px;
+            font-weight: 800;
+            color: var(--text-dark);
+        }
+
+        .theme-toggle {
+            background: rgba(16, 185, 129, 0.1);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            border-radius: 10px;
+            width: 44px;
+            height: 44px;
+            cursor: pointer;
+            font-size: 20px;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .theme-toggle:hover {
+            background: var(--primary);
+            color: white;
+        }
+
+        /* ===== MAIN CONTENT AREA ===== */
         .main-content {
-            padding: 30px;
+            padding: 35px;
         }
 
         .page-header {
@@ -150,53 +276,172 @@ $top_students = $conn->query("SELECT s.name, COUNT(cv.id) as visit_count FROM st
         }
 
         .page-header h1 {
-            font-size: 32px;
+            font-size: 28px;
             font-weight: 800;
             color: var(--text-dark);
-            margin-bottom: 5px;
+            margin-bottom: 8px;
         }
 
+        /* ===== STATS GRID ===== */
         .stats-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 20px;
-            margin-bottom: 30px;
+            gap: 22px;
+            margin-bottom: 35px;
         }
 
         .stat-card {
-            background: var(--bg-card);
-            border-radius: 12px;
-            padding: 20px;
-            box-shadow: var(--shadow);
-            border-top: 5px solid var(--primary);
+            background: linear-gradient(135deg, var(--bg-card) 0%, rgba(255, 255, 255, 0.5) 100%);
+            backdrop-filter: blur(10px);
+            border-radius: 16px;
+            padding: 28px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.06);
+            border: 1px solid rgba(255, 255, 255, 0.8);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
         }
 
-        .stat-value {
-            font-size: 32px;
-            font-weight: 800;
-            color: var(--primary);
-            margin-bottom: 5px;
+        body.dark-mode .stat-card {
+            background: linear-gradient(135deg, var(--bg-card) 0%, rgba(30, 27, 75, 0.8) 100%);
+            border-color: rgba(16, 185, 129, 0.1);
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: -50px;
+            right: -50px;
+            width: 150px;
+            height: 150px;
+            background: radial-gradient(circle, rgba(16, 185, 129, 0.15), transparent);
+            border-radius: 50%;
+            z-index: 0;
+        }
+
+        .stat-card::after {
+            content: '';
+            position: absolute;
+            bottom: -50px;
+            left: -50px;
+            width: 100px;
+            height: 100px;
+            background: radial-gradient(circle, rgba(167, 139, 250, 0.1), transparent);
+            border-radius: 50%;
+            z-index: 0;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 16px 48px rgba(16, 185, 129, 0.2);
+            border-color: rgba(16, 185, 129, 0.2);
         }
 
         .stat-label {
             font-size: 13px;
             color: var(--text-light);
+            font-weight: 600;
+            letter-spacing: 0.5px;
             text-transform: uppercase;
-            font-weight: 700;
+            position: relative;
+            z-index: 1;
         }
 
+        .stat-value {
+            font-size: 36px;
+            font-weight: 800;
+            color: var(--primary);
+            margin: 12px 0 0 0;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* ===== CHART STYLES ===== */
         .chart-card {
-            background: var(--bg-card);
-            border-radius: 12px;
+            background: linear-gradient(135deg, var(--bg-card) 0%, rgba(255, 255, 255, 0.5) 100%);
+            backdrop-filter: blur(10px);
+            border-radius: 16px;
             padding: 25px;
             margin-bottom: 30px;
-            box-shadow: var(--shadow);
+            box-shadow: 0 12px 40px rgba(16, 185, 129, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.8);
+        }
+
+        body.dark-mode .chart-card {
+            background: linear-gradient(135deg, var(--bg-card) 0%, rgba(30, 27, 75, 0.8) 100%);
+            border-color: rgba(16, 185, 129, 0.1);
         }
 
         .chart-card h2 {
             margin-bottom: 20px;
             color: var(--text-dark);
             font-size: 18px;
+            font-weight: 700;
+        }
+
+        .chart-container {
+            position: relative;
+            width: 100%;
+            height: 300px;
+        }
+
+        /* ===== TABLE STYLES ===== */
+        .table-card {
+            background: linear-gradient(135deg, var(--bg-card) 0%, rgba(255, 255, 255, 0.5) 100%);
+            backdrop-filter: blur(10px);
+            border-radius: 16px;
+            box-shadow: 0 12px 40px rgba(16, 185, 129, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.8);
+            overflow: hidden;
+            margin-top: 20px;
+        }
+
+        body.dark-mode .table-card {
+            background: linear-gradient(135deg, var(--bg-card) 0%, rgba(30, 27, 75, 0.8) 100%);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        thead {
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.1), rgba(167, 139, 250, 0.05));
+            border-bottom: 2px solid var(--border-color);
+        }
+
+        th {
+            padding: 18px 20px;
+            text-align: left;
+            font-weight: 700;
+            color: var(--text-dark);
+            font-size: 13px;
+            text-transform: uppercase;
+        }
+
+        td {
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--border-color);
+            font-size: 14px;
+        }
+
+        tbody tr {
+            transition: all 0.3s ease;
+        }
+
+        tbody tr:hover {
+            background: var(--bg-hover);
+        }
+
+        body.dark-mode tbody tr:hover {
+            background: rgba(16, 185, 129, 0.05);
+        }
+
+        @media (max-width: 768px) {
+            .sidebar { display: none; }
+            .main-wrapper { margin-left: 0; }
+            .menu-toggle { display: flex; }
+            .main-content { padding: 20px; }
         }
 
         .chart-container {
@@ -263,40 +508,64 @@ $top_students = $conn->query("SELECT s.name, COUNT(cv.id) as visit_count FROM st
 </head>
 <body>
     <!-- SIDEBAR -->
-    <aside class="sidebar">
+    <div class="sidebar" id="sidebar">
         <div class="sidebar-header">
-            <span>👔</span>
-            <div>
-                <h2>SCHoRD</h2>
-                <span class="role-badge">👨‍💼 STAFF</span>
-            </div>
+            <span class="sidebar-logo">👨‍⚕️</span>
+            <h2>SCHoRD</h2>
         </div>
         <ul class="sidebar-nav">
-            <li><a href="../dashboards/staff_dashboard.php"><span>📊</span> Dashboard</a></li>
-            <li><a href="staff_patients.php"><span>👥</span> Patients</a></li>
-            <li><a href="staff_visits.php"><span>📋</span> Visits</a></li>
-            <li><a href="staff_health_records.php"><span>📝</span> Health Records</a></li>
-            <li><a href="staff_reports.php" class="active"><span>📈</span> Reports</a></li>
-            <li style="margin-top: 20px; border-top: 2px solid rgba(255,255,255,0.1); padding-top: 20px;">
-                <a href="../auth/logout.php"><span>🚪</span> Logout</a>
-            </li>
+            <div class="sidebar-section-label">Main</div>
+            <li><a href="../dashboards/staff_dashboard.php" class="nav-link">📊 Dashboard</a></li>
+            
+            <div class="sidebar-section-label">Operation</div>
+            <li><a href="staff_visits.php" class="nav-link">📋 Clinic Visits</a></li>
+            <li><a href="staff_patients.php" class="nav-link">👥 Patients</a></li>
+            <li><a href="staff_health_records.php" class="nav-link">📝 Health Records</a></li>
+            
+            <div class="sidebar-section-label">Reporting</div>
+            <li><a href="staff_reports.php" class="nav-link active">📈 Reports</a></li>
+            
+            <li><a href="../auth/logout.php" class="nav-link">🚪 Logout</a></li>
         </ul>
-    </aside>
+    </div>
 
-    <div class="main-wrapper">
-        <header class="top-header">
-            <h2 style="color: var(--text-dark);">📈 Reports</h2>
-        </header>
+    <!-- MAIN WRAPPER -->
+    <div class="main-wrapper" id="mainWrapper">
+        <!-- TOP HEADER -->
+        <div class="top-header">
+            <div class="header-left">
+                <button class="menu-toggle" id="menuToggle">☰</button>
+                <h1 class="header-title">📈 Reports</h1>
+            </div>
+            
+            <div class="header-right">
+                <div class="search-box">
+                    <span>🔍</span>
+                    <input type="text" placeholder="Search reports...">
+                </div>
 
-        <div class="main-content">
+                <button class="theme-toggle" id="themeToggle" title="Toggle Dark Mode">🌙</button>
+
+                <div class="user-profile">
+                    <div class="user-avatar"><?php echo strtoupper(substr($user['name'], 0, 1)); ?></div>
+                    <div>
+                        <div style="font-weight: 600; font-size: 14px;"><?php echo substr(htmlspecialchars($user['name']), 0, 12); ?></div>
+                        <div style="font-size: 12px; color: var(--text-light);">Staff</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- MAIN CONTENT -->
+        <main class="main-content">
             <div class="page-header">
                 <h1>Staff Analytics & Reports</h1>
             </div>
 
-            <!-- STATS -->
+            <!-- STATS GRID -->
             <div class="stats-grid">
                 <div class="stat-card">
-                    <div class="stat-label">Total Students</div>
+                    <div class="stat-label">Total Patients</div>
                     <div class="stat-value"><?php echo $total_students; ?></div>
                 </div>
                 <div class="stat-card">
@@ -321,12 +590,12 @@ $top_students = $conn->query("SELECT s.name, COUNT(cv.id) as visit_count FROM st
                 </div>
             </div>
 
-            <!-- TOP STUDENTS -->
+            <!-- TOP PATIENTS -->
             <div class="table-card">
                 <table>
                     <thead>
                         <tr>
-                            <th>Top Students by Visits</th>
+                            <th>Top Patients by Visits</th>
                             <th>Number of Visits</th>
                         </tr>
                     </thead>
@@ -334,16 +603,53 @@ $top_students = $conn->query("SELECT s.name, COUNT(cv.id) as visit_count FROM st
                         <?php while ($student = $top_students->fetch_assoc()): ?>
                             <tr>
                                 <td><?php echo htmlspecialchars($student['name']); ?></td>
-                                <td><span class="badge badge-info"><?php echo $student['visit_count']; ?></span></td>
+                                <td><strong><?php echo $student['visit_count']; ?></strong></td>
                             </tr>
                         <?php endwhile; ?>
                     </tbody>
                 </table>
             </div>
-        </div>
+        </main>
+
+        <!-- FOOTER -->
+        <?php include('../includes/footer.php'); ?>
     </div>
 
     <script>
+        // Theme Toggle
+        const themeToggle = document.getElementById('themeToggle');
+        const body = document.body;
+        const sidebar = document.getElementById('sidebar');
+        const mainWrapper = document.getElementById('mainWrapper');
+        const menuToggle = document.getElementById('menuToggle');
+
+        // Load saved theme
+        const savedTheme = localStorage.getItem('theme') || 'light';
+        if (savedTheme === 'dark') {
+            body.classList.add('dark-mode');
+            themeToggle.textContent = '☀️';
+        }
+
+        themeToggle.addEventListener('click', () => {
+            body.classList.toggle('dark-mode');
+            const isDark = body.classList.contains('dark-mode');
+            localStorage.setItem('theme', isDark ? 'dark' : 'light');
+            themeToggle.textContent = isDark ? '☀️' : '🌙';
+        });
+
+        // Menu toggle for mobile
+        menuToggle.addEventListener('click', () => {
+            sidebar.classList.toggle('collapsed');
+            mainWrapper.classList.toggle('sidebar-collapsed');
+        });
+
+        // Add active navigation indicator
+        document.querySelectorAll('.sidebar-nav a').forEach(link => {
+            if (link.getAttribute('href') === 'staff_reports.php') {
+                link.classList.add('active');
+            }
+        });
+
         // Visit Chart
         const ctx = document.getElementById('visitChart').getContext('2d');
         new Chart(ctx, {
@@ -351,15 +657,15 @@ $top_students = $conn->query("SELECT s.name, COUNT(cv.id) as visit_count FROM st
             data: {
                 labels: <?php echo json_encode($months); ?>,
                 datasets: [{
-                    label: 'Visits',
+                    label: 'Monthly Visits',
                     data: <?php echo json_encode($visit_counts); ?>,
                     fill: true,
-                    backgroundColor: 'rgba(99, 102, 241, 0.1)',
-                    borderColor: 'rgba(99, 102, 241, 1)',
+                    backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                    borderColor: '#10b981',
                     borderWidth: 3,
                     tension: 0.4,
                     pointRadius: 6,
-                    pointBackgroundColor: 'rgba(99, 102, 241, 1)',
+                    pointBackgroundColor: '#10b981',
                     pointHoverRadius: 8
                 }]
             },
@@ -378,11 +684,22 @@ $top_students = $conn->query("SELECT s.name, COUNT(cv.id) as visit_count FROM st
                 scales: {
                     y: {
                         beginAtZero: true,
-                        ticks: { stepSize: 1 }
+                        ticks: { stepSize: 1, color: '#64748b' },
+                        grid: { color: 'rgba(16, 185, 129, 0.1)' }
+                    },
+                    x: {
+                        ticks: { color: '#64748b' },
+                        grid: { color: 'rgba(16, 185, 129, 0.1)' }
                     }
                 }
             }
         });
+
+        // Dark mode support for chart
+        if (body.classList.contains('dark-mode')) {
+            console.log('Dark mode active');
+        }
     </script>
 </body>
 </html>
+

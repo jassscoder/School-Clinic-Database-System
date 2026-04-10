@@ -1,4 +1,5 @@
 <?php
+header('Content-Type: text/html; charset=utf-8');
 include '../config/db.php';
 requireLogin();
 
@@ -367,6 +368,20 @@ $recent_activities = $conn->query("
 
         .search-box input::placeholder {
             color: var(--text-lighter);
+        }
+
+        /* Search Results Styling */
+        .data-card.search-highlight,
+        .stat-card.search-highlight,
+        .chart-card.search-highlight {
+            border-color: var(--primary) !important;
+            box-shadow: 0 0 20px rgba(99, 102, 241, 0.3) !important;
+        }
+
+        body.dark-mode .data-card.search-highlight,
+        body.dark-mode .stat-card.search-highlight,
+        body.dark-mode .chart-card.search-highlight {
+            box-shadow: 0 0 20px rgba(99, 102, 241, 0.5) !important;
         }
 
         .header-right {
@@ -1336,223 +1351,6 @@ $recent_activities = $conn->query("
     </div>
 
     <script>
-                    <input type="text" placeholder="Search students, visits, records...">
-                </div>
-            </div>
-            
-            <div class="header-right">
-                <div class="notification-center">
-                    <button class="notification-btn" id="notifBtn">
-                        🔔
-                        <span class="notification-badge">3</span>
-                    </button>
-                    <div class="dropdown-menu" id="notifDropdown">
-                        <div class="dropdown-item">
-                            <span>✅</span>
-                            <div>
-                                <div class="activity-subject">New visit recorded</div>
-                                <div class="activity-time">2 minutes ago</div>
-                            </div>
-                        </div>
-                        <div class="dropdown-item">
-                            <span>👤</span>
-                            <div>
-                                <div class="activity-subject">New student registered</div>
-                                <div class="activity-time">15 minutes ago</div>
-                            </div>
-                        </div>
-                        <div class="dropdown-item">
-                            <span>⚠️</span>
-                            <div>
-                                <div class="activity-subject">System backup completed</div>
-                                <div class="activity-time">1 hour ago</div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <button class="theme-toggle" id="themeToggle">🌙</button>
-
-                <div class="user-profile">
-                    <div class="user-avatar"><?php echo strtoupper(substr($user['name'], 0, 1)); ?></div>
-                    <div>
-                        <div style="font-weight: 600; font-size: 14px;"><?php echo substr(htmlspecialchars($user['name']), 0, 12); ?></div>
-                        <div style="font-size: 12px; color: var(--text-light);">Admin</div>
-                    </div>
-                </div>
-            </div>
-        </header>
-
-        <!-- MAIN CONTENT -->
-        <div class="main-content">
-            <!-- WELCOME SECTION -->
-            <div class="welcome-section">
-                <div class="welcome-text">
-                    <h2>Welcome back, <?php echo htmlspecialchars($user['name']); ?>! 👋</h2>
-                    <p>Here's your system overview and real-time analytics dashboard</p>
-                </div>
-                <button class="export-btn" onclick="exportData()">📥 Export Report</button>
-            </div>
-
-            <!-- KEY METRICS -->
-            <div class="stats-grid">
-                <div class="stat-card primary">
-                    <div class="stat-icon">👥</div>
-                    <div class="stat-value"><?php echo $total_students; ?></div>
-                    <div class="stat-label">Total Students</div>
-                    <div class="stat-trend">↑ 12% from last month</div>
-                </div>
-                <div class="stat-card success">
-                    <div class="stat-icon">📝</div>
-                    <div class="stat-value"><?php echo $total_visits; ?></div>
-                    <div class="stat-label">Total Visits</div>
-                    <div class="stat-trend">↑ 8% from last month</div>
-                </div>
-                <div class="stat-card warning">
-                    <div class="stat-icon">⏳</div>
-                    <div class="stat-value"><?php echo $ongoing_visits; ?></div>
-                    <div class="stat-label">Ongoing Visits</div>
-                    <div class="stat-trend">✓ <?php echo $completed_visits; ?> completed</div>
-                </div>
-                <div class="stat-card info">
-                    <div class="stat-icon">👨‍💼</div>
-                    <div class="stat-value"><?php echo $total_users; ?></div>
-                    <div class="stat-label">System Users</div>
-                    <div class="stat-trend">↑ <?php echo $total_staff; ?> active staff</div>
-                </div>
-            </div>
-
-            <!-- CHARTS SECTION -->
-            <div class="charts-grid">
-                <div class="chart-card">
-                    <h3>📈 Monthly Visit Trends</h3>
-                    <div class="chart-container">
-                        <canvas id="visitsChart"></canvas>
-                    </div>
-                </div>
-                <div class="chart-card">
-                    <h3>👥 User Role Distribution</h3>
-                    <div class="chart-container">
-                        <canvas id="roleChart"></canvas>
-                    </div>
-                </div>
-            </div>
-
-            <!-- SECONDARY CHARTS -->
-            <div class="charts-grid">
-                <div class="chart-card">
-                    <h3>🏥 Top Health Complaints</h3>
-                    <div class="chart-container">
-                        <canvas id="complaintsChart"></canvas>
-                    </div>
-                </div>
-                <div class="chart-card">
-                    <h3>📊 Visit Status Overview</h3>
-                    <div class="chart-container">
-                        <canvas id="statusChart"></canvas>
-                    </div>
-                </div>
-            </div>
-
-            <!-- DATA SECTION -->
-            <div class="data-grid">
-                <div class="data-card">
-                    <h3>⏰ Recent Activities</h3>
-                    <?php while ($activity = $recent_activities->fetch_assoc()): ?>
-                        <div class="activity-item">
-                            <div class="activity-icon"><?php echo $activity['icon']; ?></div>
-                            <div class="activity-content">
-                                <div class="activity-subject"><?php echo htmlspecialchars(substr($activity['subject'], 0, 35)); ?></div>
-                                <div class="activity-time"><?php echo date('M d, Y H:i', strtotime($activity['date'])); ?></div>
-                            </div>
-                        </div>
-                    <?php endwhile; ?>
-                </div>
-
-                <div class="data-card">
-                    <h3>📊 System Performance</h3>
-                    <ul class="stat-list">
-                        <li>
-                            <span class="stat-name">Database Health</span>
-                            <span class="stat-count">✓ Optimal</span>
-                        </li>
-                        <li>
-                            <span class="stat-name">System Uptime</span>
-                            <span class="stat-count">99.9%</span>
-                        </li>
-                        <li>
-                            <span class="stat-name">Response Time</span>
-                            <span class="stat-count">127ms</span>
-                        </li>
-                        <li>
-                            <span class="stat-name">Data Backup</span>
-                            <span class="stat-count">✓ Recent</span>
-                        </li>
-                        <li>
-                            <span class="stat-name">Active Sessions</span>
-                            <span class="stat-count"><?php echo $total_users; ?></span>
-                        </li>
-                    </ul>
-                </div>
-
-                <div class="data-card">
-                    <h3>📈 Quick Statistics</h3>
-                    <ul class="stat-list">
-                        <li>
-                            <span class="stat-name">Visits Today</span>
-                            <span class="stat-count"><?php echo $visits_today; ?></span>
-                        </li>
-                        <li>
-                            <span class="stat-name">Visits This Month</span>
-                            <span class="stat-count"><?php echo $visits_this_month; ?></span>
-                        </li>
-                        <li>
-                            <span class="stat-name">Total Staff Members</span>
-                            <span class="stat-count"><?php echo $total_staff; ?></span>
-                        </li>
-                        <li>
-                            <span class="stat-name">Admin Users</span>
-                            <span class="stat-count"><?php echo $total_admins; ?></span>
-                        </li>
-                        <li>
-                            <span class="stat-name">Completion Rate</span>
-                            <span class="stat-count"><?php echo round((($completed_visits / max(1, $total_visits)) * 100)); ?>%</span>
-                        </li>
-                    </ul>
-                </div>
-            </div>
-
-            <!-- ACTIONS -->
-            <div class="actions-grid">
-                <a class="action-card" href="admin_students.php">
-                    <span class="action-icon">👨‍🎓</span>
-                    Manage Students
-                </a>
-                <a class="action-card" href="admin_visits.php">
-                    <span class="action-icon">📝</span>
-                    Record Visit
-                </a>
-                <a class="action-card" href="admin_records.php">
-                    <span class="action-icon">📋</span>
-                    View Records
-                </a>
-                <a class="action-card" href="admin_reports.php">
-                    <span class="action-icon">📊</span>
-                    View Reports
-                </a>
-                <a class="action-card" href="admin_settings.php">
-                    <span class="action-icon">⚙️</span>
-                    Settings
-                </a>
-                <a class="action-card" href="admin_users.php">
-                    <span class="action-icon">👥</span>
-                    Manage Users
-                </a>
-            </div>
-        </div>
-    </div>
-
-    <script>
         // Set active nav item based on current page
         document.addEventListener('DOMContentLoaded', function() {
             const currentPage = window.location.pathname.split('/').pop();
@@ -1614,12 +1412,67 @@ $recent_activities = $conn->query("
             }
         });
 
-        // Search functionality
+        // Search functionality with results display
         document.getElementById('searchInput')?.addEventListener('input', function(e) {
-            const query = e.target.value.toLowerCase();
-            if (query.length > 0) {
-                console.log('Searching for:', query);
-                // Add search logic here
+            const query = e.target.value.toLowerCase().trim();
+            
+            if (query.length === 0) {
+                // Reset - show all content
+                document.querySelectorAll('.data-card, .stat-card, .chart-card').forEach(card => {
+                    card.style.display = '';
+                    card.style.opacity = '1';
+                });
+                return;
+            }
+
+            // Search through all content
+            let matchCount = 0;
+            const searchResults = [];
+            
+            // Search in data cards
+            document.querySelectorAll('.data-card').forEach(card => {
+                const text = card.textContent.toLowerCase();
+                const title = card.querySelector('h3')?.textContent.toLowerCase() || '';
+                
+                if (text.includes(query) || title.includes(query)) {
+                    card.style.display = '';
+                    card.style.opacity = '1';
+                    matchCount++;
+                    searchResults.push(title);
+                } else {
+                    card.style.opacity = '0.3';
+                }
+            });
+
+            // Search in stat cards
+            document.querySelectorAll('.stat-card').forEach(card => {
+                const text = card.textContent.toLowerCase();
+                
+                if (text.includes(query)) {
+                    card.style.opacity = '1';
+                    matchCount++;
+                } else {
+                    card.style.opacity = '0.3';
+                }
+            });
+
+            // Search in chart cards
+            document.querySelectorAll('.chart-card').forEach(card => {
+                const text = card.textContent.toLowerCase();
+                
+                if (text.includes(query)) {
+                    card.style.opacity = '1';
+                    matchCount++;
+                } else {
+                    card.style.opacity = '0.3';
+                }
+            });
+
+            // Show feedback
+            if (matchCount === 0) {
+                console.log('❌ No results found for: ' + query);
+            } else {
+                console.log('✅ Found ' + matchCount + ' matching results');
             }
         });
 

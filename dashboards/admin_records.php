@@ -1,4 +1,10 @@
 <?php
+// Prevent caching of this page
+header('Cache-Control: no-cache, no-store, must-revalidate, private, max-age=0');
+header('Pragma: no-cache');
+header('Expires: ' . gmdate('D, d M Y H:i:s', time() - 3600) . ' GMT');
+header('Content-Type: text/html; charset=utf-8');
+
 include '../config/db.php';
 requireLogin();
 
@@ -50,6 +56,14 @@ $total_records = $conn->query("SELECT COUNT(*) as count FROM health_records")->f
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Health Records - Admin Dashboard</title>
     <style>
+        /* Hide any stray CSS text that might appear */
+        body::before,
+        body::after,
+        .container::before,
+        .container::after {
+            display: none !important;
+        }
+        
         * {
             margin: 0;
             padding: 0;
@@ -350,212 +364,6 @@ $total_records = $conn->query("SELECT COUNT(*) as count FROM health_records")->f
                     <?php endif; ?>
                 </tbody>
             </table>
-        </div>
-    </div>
-</body>
-</html>
-            padding: 12px 24px;
-            border: none;
-            border-radius: 8px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            font-size: 14px;
-        }
-
-        .btn-secondary {
-            background: var(--bg-light);
-            color: var(--text-dark);
-            border: 1px solid #ddd;
-        }
-
-        .btn-secondary:hover {
-            background: #e2e8f0;
-        }
-
-        .alert {
-            padding: 15px 20px;
-            border-radius: 8px;
-            margin-bottom: 20px;
-            font-weight: 500;
-        }
-
-        .alert-success {
-            background: #d1fae5;
-            color: #065f46;
-            border-left: 4px solid var(--success);
-        }
-
-        .alert-error {
-            background: #fee2e2;
-            color: #7f1d1d;
-            border-left: 4px solid #ef4444;
-        }
-
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 20px;
-            margin-bottom: 30px;
-        }
-
-        .stat-card {
-            background: var(--bg-card);
-            padding: 20px;
-            border-radius: 12px;
-            box-shadow: var(--shadow);
-        }
-
-        .stat-value {
-            font-size: 28px;
-            font-weight: 800;
-            color: var(--primary);
-            margin-bottom: 5px;
-        }
-
-        .stat-label {
-            font-size: 13px;
-            color: var(--text-light);
-            text-transform: uppercase;
-            font-weight: 600;
-        }
-
-        .table-container {
-            background: var(--bg-card);
-            border-radius: 12px;
-            overflow: hidden;
-            box-shadow: var(--shadow);
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-
-        thead {
-            background: var(--bg-light);
-            border-bottom: 2px solid rgba(0, 0, 0, 0.05);
-        }
-
-        th {
-            padding: 15px 20px;
-            text-align: left;
-            font-weight: 700;
-            color: var(--text-dark);
-            font-size: 13px;
-            text-transform: uppercase;
-        }
-
-        td {
-            padding: 15px 20px;
-            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
-            color: var(--text-dark);
-            font-size: 14px;
-        }
-
-        tbody tr:hover {
-            background: var(--bg-light);
-        }
-
-        .action-btn {
-            padding: 6px 12px;
-            border: none;
-            border-radius: 6px;
-            font-size: 12px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .action-view {
-            background: #3b82f6;
-            color: white;
-        }
-
-        .action-view:hover {
-            background: #2563eb;
-        }
-
-        .action-delete {
-            background: #ef4444;
-            color: white;
-        }
-
-        .action-delete:hover {
-            background: #dc2626;
-        }
-
-        .actions {
-            display: flex;
-            gap: 8px;
-        }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <!-- Header -->
-        <div class="header">
-            <div>
-                <h1>📋 Health Records</h1>
-            </div>
-            <div>
-                <button class="btn btn-secondary" onclick="window.location.href='dashboard_admin.php'">← Back to Dashboard</button>
-            </div>
-        </div>
-
-        <!-- Alerts -->
-        <?php if ($success): ?>
-            <div class="alert alert-success"><?php echo $success; ?></div>
-        <?php endif; ?>
-        <?php if ($error): ?>
-            <div class="alert alert-error"><?php echo $error; ?></div>
-        <?php endif; ?>
-
-        <!-- Statistics -->
-        <div class="stats-grid">
-            <div class="stat-card">
-                <div class="stat-value"><?php echo $total_records; ?></div>
-                <div class="stat-label">Total Records</div>
-            </div>
-        </div>
-
-        <!-- Records Table -->
-        <div class="table-container">
-            <?php if ($records->num_rows > 0): ?>
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Student</th>
-                            <th>Blood Pressure</th>
-                            <th>Temperature</th>
-                            <th>Weight</th>
-                            <th>Last Check</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <?php while ($r = $records->fetch_assoc()): ?>
-                            <tr>
-                                <td><strong><?php echo htmlspecialchars($r['student_name']); ?></strong><br><small><?php echo htmlspecialchars($r['student_no']); ?></small></td>
-                                <td><?php echo htmlspecialchars($r['blood_pressure'] ?? 'N/A'); ?></td>
-                                <td><?php echo htmlspecialchars($r['temperature'] ?? 'N/A'); ?> °C</td>
-                                <td><?php echo htmlspecialchars($r['weight'] ?? 'N/A'); ?> kg</td>
-                                <td><?php echo $r['last_check_date'] ? date('M d, Y', strtotime($r['last_check_date'])) : 'N/A'; ?></td>
-                                <td>
-                                    <div class="actions">
-                                        <button class="action-btn action-view" type="button" onclick="window.location.href='../pages/health_records.php?id=<?php echo $r['student_id']; ?>'">👁️ View</button>
-                                        <button class="action-btn action-delete" type="button" onclick="if(confirm('Are you sure?')) { window.location.href='admin_records.php?delete=<?php echo $r['id']; ?>'; }">🗑️ Delete</button>
-                                    </div>
-                                </td>
-                            </tr>
-                        <?php endwhile; ?>
-                    </tbody>
-                </table>
-            <?php else: ?>
-                <div style="padding: 40px; text-align: center; color: var(--text-light);">
-                    <div style="font-size: 48px; margin-bottom: 10px;">📋</div>
-                    <p>No health records found.</p>
-                </div>
-            <?php endif; ?>
         </div>
     </div>
 </body>

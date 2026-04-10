@@ -1,4 +1,5 @@
 <?php
+header('Content-Type: text/html; charset=utf-8');
 include '../config/db.php';
 requireLogin();
 
@@ -49,7 +50,8 @@ $health_overview = $conn->query("
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Staff Dashboard - SCHoRD Clinical Health Records</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -61,33 +63,33 @@ $health_overview = $conn->query("
         }
 
         :root {
-            --primary: #059669;
-            --primary-light: #10b981;
-            --primary-dark: #047857;
-            --accent: #34d399;
-            --accent-light: #6ee7b7;
+            --primary: #10b981;
+            --primary-light: #34d399;
+            --primary-dark: #059669;
+            --accent: #6ee7b7;
+            --accent-light: #a7f3d0;
             --success: #10b981;
             --warning: #f59e0b;
             --danger: #ef4444;
             --info: #3b82f6;
             --dark: #064e3b;
             --darker: #022c1d;
-            --text-dark: #065f46;
+            --text-dark: #1f2937;
             --text-light: #64748b;
             --text-lighter: #94a3b8;
-            --bg-light: #ecfdf5;
-            --bg-lighter: #d1fae5;
+            --bg-light: #f0fdf4;
+            --bg-lighter: #dcfce7;
             --bg-card: #ffffff;
-            --bg-hover: #f0fdf4;
-            --border-color: #a7f3d0;
-            --shadow: 0 10px 40px rgba(6, 78, 59, 0.1);
-            --shadow-lg: 0 20px 60px rgba(6, 78, 59, 0.15);
-            --shadow-glow: 0 0 60px rgba(5, 150, 105, 0.15);
+            --bg-hover: #ecfdf5;
+            --border-color: #bbf7d0;
+            --shadow: 0 10px 40px rgba(16, 185, 129, 0.1);
+            --shadow-lg: 0 20px 60px rgba(16, 185, 129, 0.15);
+            --shadow-glow: 0 0 60px rgba(16, 185, 129, 0.15);
         }
 
         body {
             font-family: 'Inter', 'Segoe UI', system-ui, sans-serif;
-            background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 50%, #e0fce8 100%);
+            background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 50%, #e0fce8 100%);
             color: var(--text-dark);
             min-height: 100vh;
             letter-spacing: -0.3px;
@@ -100,7 +102,7 @@ $health_overview = $conn->query("
             --bg-card: #064e3b;
             --bg-hover: #0d5d4a;
             --border-color: #047857;
-            --text-dark: #ecfdf5;
+            --text-dark: #e0f2fe;
             --text-light: #cbd5e1;
             --text-lighter: #94a3b8;
         }
@@ -117,10 +119,10 @@ $health_overview = $conn->query("
             overflow-y: auto;
             z-index: 1000;
             transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-            border-right: 1px solid rgba(5, 150, 105, 0.1);
+            border-right: 1px solid rgba(16, 185, 129, 0.15);
             box-shadow: 10px 0 40px rgba(0, 0, 0, 0.2);
             scrollbar-width: thin;
-            scrollbar-color: rgba(5, 150, 105, 0.2) transparent;
+            scrollbar-color: rgba(16, 185, 129, 0.2) transparent;
         }
 
         .sidebar::-webkit-scrollbar {
@@ -132,7 +134,7 @@ $health_overview = $conn->query("
         }
 
         .sidebar::-webkit-scrollbar-thumb {
-            background: rgba(5, 150, 105, 0.2);
+            background: rgba(16, 185, 129, 0.2);
             border-radius: 10px;
         }
 
@@ -142,11 +144,11 @@ $health_overview = $conn->query("
 
         .sidebar-header {
             padding: 30px 25px;
-            border-bottom: 1px solid rgba(5, 150, 105, 0.15);
+            border-bottom: 1px solid rgba(16, 185, 129, 0.15);
             display: flex;
             align-items: center;
             gap: 12px;
-            background: linear-gradient(135deg, rgba(5, 150, 105, 0.1) 0%, rgba(52, 211, 153, 0.05) 100%);
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.1) 0%, rgba(52, 211, 153, 0.05) 100%);
         }
 
         .sidebar-header h2 {
@@ -161,7 +163,7 @@ $health_overview = $conn->query("
 
         .sidebar-logo {
             font-size: 28px;
-            filter: drop-shadow(0 4px 10px rgba(5, 150, 105, 0.3));
+            filter: drop-shadow(0 4px 10px rgba(16, 185, 129, 0.3));
         }
 
         .sidebar-nav {
@@ -201,7 +203,7 @@ $health_overview = $conn->query("
             top: 0;
             bottom: 0;
             width: 0;
-            background: rgba(5, 150, 105, 0.1);
+            background: rgba(16, 185, 129, 0.1);
             transition: width 0.3s ease;
             pointer-events: none;
         }
@@ -209,7 +211,7 @@ $health_overview = $conn->query("
         .sidebar-nav a:hover,
         .sidebar-nav a.active {
             color: white;
-            background: rgba(5, 150, 105, 0.1);
+            background: rgba(16, 185, 129, 0.1);
             transform: translateX(4px);
         }
 
@@ -220,13 +222,28 @@ $health_overview = $conn->query("
 
         .sidebar-nav a.active {
             border-left-color: var(--accent);
-            text-shadow: 0 0 10px rgba(5, 150, 105, 0.5);
+            text-shadow: 0 0 10px rgba(16, 185, 129, 0.5);
         }
 
         .sidebar-nav .icon {
             font-size: 18px;
             min-width: 20px;
-            filter: drop-shadow(0 2px 4px rgba(5, 150, 105, 0.2));
+            filter: drop-shadow(0 2px 4px rgba(16, 185, 129, 0.2));
+        }
+
+        .sidebar-section {
+            margin-top: 30px;
+            border-top: 1px solid rgba(16, 185, 129, 0.15);
+            padding-top: 15px;
+        }
+
+        .sidebar-section-label {
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            color: rgba(255, 255, 255, 0.4);
+            margin: 0 20px 10px 20px;
+            letter-spacing: 1px;
         }
 
         /* ===== MAIN CONTENT ===== */
@@ -258,22 +275,34 @@ $health_overview = $conn->query("
 
         body.dark-mode .top-header {
             background: rgba(6, 78, 59, 0.5);
-            border-bottom-color: rgba(5, 150, 105, 0.1);
+            border-bottom-color: rgba(16, 185, 129, 0.1);
         }
 
         .header-left {
             display: flex;
             align-items: center;
             gap: 20px;
+            flex: 1;
+            min-width: 0;
         }
 
         .menu-toggle {
             display: none;
-            background: none;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
             border: none;
-            font-size: 24px;
+            font-size: 22px;
             cursor: pointer;
-            color: var(--text-dark);
+            color: white;
+            width: 44px;
+            height: 44px;
+            border-radius: 10px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+        }
+
+        .menu-toggle:hover {
+            transform: scale(1.05);
+            box-shadow: 0 8px 20px rgba(16, 185, 129, 0.4);
         }
 
         .header-title {
@@ -281,6 +310,9 @@ $health_overview = $conn->query("
             font-weight: 800;
             color: var(--text-dark);
             letter-spacing: -0.5px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
 
         .header-right {
@@ -292,12 +324,18 @@ $health_overview = $conn->query("
         .search-box {
             display: flex;
             align-items: center;
-            background: rgba(5, 150, 105, 0.08);
-            border: 1px solid rgba(5, 150, 105, 0.3);
+            background: rgba(16, 185, 129, 0.08);
+            border: 1px solid rgba(16, 185, 129, 0.3);
             border-radius: 10px;
             padding: 10px 16px;
             gap: 10px;
             min-width: 300px;
+            transition: all 0.3s ease;
+        }
+
+        .search-box:focus-within {
+            border-color: var(--primary);
+            box-shadow: 0 8px 24px rgba(16, 185, 129, 0.15);
         }
 
         .search-box input {
@@ -314,8 +352,8 @@ $health_overview = $conn->query("
         }
 
         .theme-toggle {
-            background: rgba(5, 150, 105, 0.1);
-            border: 1px solid rgba(5, 150, 105, 0.3);
+            background: rgba(16, 185, 129, 0.1);
+            border: 1px solid rgba(16, 185, 129, 0.3);
             border-radius: 10px;
             width: 44px;
             height: 44px;
@@ -331,6 +369,8 @@ $health_overview = $conn->query("
             background: var(--primary);
             color: white;
             border-color: var(--primary);
+            transform: scale(1.05);
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
         }
 
         .user-profile {
@@ -338,26 +378,39 @@ $health_overview = $conn->query("
             align-items: center;
             gap: 12px;
             padding: 8px 12px;
-            background: rgba(5, 150, 105, 0.08);
+            background: rgba(16, 185, 129, 0.08);
             border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .user-profile:hover {
+            background: rgba(16, 185, 129, 0.15);
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.15);
         }
 
         .user-avatar {
             width: 36px;
             height: 36px;
             border-radius: 50%;
-            background: linear-gradient(135deg, #059669, #10b981);
+            background: linear-gradient(135deg, #10b981, #34d399);
             color: white;
             display: flex;
             align-items: center;
             justify-content: center;
             font-weight: 700;
             font-size: 14px;
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.25);
         }
 
         /* ===== MAIN CONTENT AREA ===== */
         .main-content {
             padding: 35px;
+            background: linear-gradient(135deg, var(--bg-lighter) 0%, var(--bg-light) 100%);
+        }
+
+        body.dark-mode .main-content {
+            background: linear-gradient(135deg, #022c1d 0%, #064e3b 100%);
         }
 
         .welcome-section {
@@ -369,13 +422,32 @@ $health_overview = $conn->query("
             backdrop-filter: blur(10px);
             padding: 30px;
             border-radius: 16px;
-            border: 1px solid rgba(5, 150, 105, 0.1);
+            border: 1px solid rgba(16, 185, 129, 0.1);
             box-shadow: var(--shadow);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .welcome-section::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -10%;
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(circle, rgba(16, 185, 129, 0.15), transparent);
+            border-radius: 50%;
+            z-index: 0;
         }
 
         body.dark-mode .welcome-section {
             background: linear-gradient(135deg, var(--bg-card) 0%, rgba(6, 78, 59, 0.8) 100%);
-            border-color: rgba(5, 150, 105, 0.15);
+            border-color: rgba(16, 185, 129, 0.15);
+        }
+
+        .welcome-text {
+            position: relative;
+            z-index: 1;
         }
 
         .welcome-text h2 {
@@ -389,6 +461,7 @@ $health_overview = $conn->query("
         .welcome-text p {
             color: var(--text-light);
             font-size: 14px;
+            font-weight: 500;
         }
 
         .export-btn {
@@ -401,11 +474,18 @@ $health_overview = $conn->query("
             cursor: pointer;
             transition: all 0.3s ease;
             font-size: 14px;
+            position: relative;
+            z-index: 1;
+            box-shadow: 0 8px 24px rgba(16, 185, 129, 0.25);
         }
 
         .export-btn:hover {
             transform: translateY(-2px);
-            box-shadow: 0 8px 24px rgba(5, 150, 105, 0.3);
+            box-shadow: 0 12px 32px rgba(16, 185, 129, 0.35);
+        }
+
+        .export-btn:active {
+            transform: translateY(0);
         }
 
         /* ===== STATS GRID ===== */
@@ -430,7 +510,7 @@ $health_overview = $conn->query("
 
         body.dark-mode .stat-card {
             background: linear-gradient(135deg, var(--bg-card) 0%, rgba(6, 78, 59, 0.8) 100%);
-            border-color: rgba(5, 150, 105, 0.1);
+            border-color: rgba(16, 185, 129, 0.1);
         }
 
         .stat-card::before {
@@ -440,7 +520,7 @@ $health_overview = $conn->query("
             right: -50px;
             width: 150px;
             height: 150px;
-            background: radial-gradient(circle, rgba(5, 150, 105, 0.15), transparent);
+            background: radial-gradient(circle, rgba(16, 185, 129, 0.15), transparent);
             border-radius: 50%;
             z-index: 0;
         }
@@ -459,8 +539,8 @@ $health_overview = $conn->query("
 
         .stat-card:hover {
             transform: translateY(-8px);
-            box-shadow: 0 16px 48px rgba(5, 150, 105, 0.2);
-            border-color: rgba(5, 150, 105, 0.2);
+            box-shadow: 0 16px 48px rgba(16, 185, 129, 0.2);
+            border-color: rgba(16, 185, 129, 0.2);
         }
 
         .stat-card.success { --stat-color: var(--success); }
@@ -540,7 +620,7 @@ $health_overview = $conn->query("
 
         body.dark-mode .action-card {
             background: linear-gradient(135deg, var(--bg-card) 0%, rgba(6, 78, 59, 0.8) 100%);
-            border-color: rgba(5, 150, 105, 0.1);
+            border-color: rgba(16, 185, 129, 0.1);
         }
 
         .action-card::before {
@@ -561,7 +641,7 @@ $health_overview = $conn->query("
             border-color: transparent;
             color: white;
             transform: translateY(-6px);
-            box-shadow: 0 12px 32px rgba(5, 150, 105, 0.3);
+            box-shadow: 0 12px 32px rgba(16, 185, 129, 0.3);
         }
 
         .action-card:hover::before {
@@ -583,6 +663,7 @@ $health_overview = $conn->query("
             font-size: 14px;
             position: relative;
             z-index: 1;
+            font-weight: 600;
         }
 
         /* ===== DATA SECTION ===== */
@@ -615,14 +696,14 @@ $health_overview = $conn->query("
             background: linear-gradient(135deg, var(--bg-card) 0%, rgba(255, 255, 255, 0.5) 100%);
             backdrop-filter: blur(10px);
             border-radius: 16px;
-            box-shadow: 0 12px 40px rgba(5, 150, 105, 0.1);
+            box-shadow: 0 12px 40px rgba(16, 185, 129, 0.1);
             border: 1px solid rgba(255, 255, 255, 0.8);
             overflow: hidden;
         }
 
         body.dark-mode .table-wrapper {
             background: linear-gradient(135deg, var(--bg-card) 0%, rgba(6, 78, 59, 0.8) 100%);
-            border-color: rgba(5, 150, 105, 0.1);
+            border-color: rgba(16, 185, 129, 0.1);
         }
 
         table {
@@ -631,12 +712,12 @@ $health_overview = $conn->query("
         }
 
         thead {
-            background: linear-gradient(135deg, rgba(5, 150, 105, 0.1), rgba(52, 211, 153, 0.05));
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.1), rgba(52, 211, 153, 0.05));
             border-bottom: 2px solid var(--border-color);
         }
 
         body.dark-mode thead {
-            background: linear-gradient(135deg, rgba(5, 150, 105, 0.15), rgba(52, 211, 153, 0.08));
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.15), rgba(52, 211, 153, 0.08));
         }
 
         th {
@@ -664,7 +745,7 @@ $health_overview = $conn->query("
         }
 
         body.dark-mode tbody tr:hover {
-            background: rgba(5, 150, 105, 0.05);
+            background: rgba(16, 185, 129, 0.05);
         }
 
         .status-badge {
@@ -697,19 +778,51 @@ $health_overview = $conn->query("
             border-left: 4px solid var(--primary);
             padding: 20px;
             border-radius: 12px;
-            box-shadow: 0 4px 12px rgba(5, 150, 105, 0.1);
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .info-card:hover {
+            transform: translateX(4px);
+            box-shadow: 0 8px 20px rgba(16, 185, 129, 0.15);
         }
 
         .info-card strong {
             color: var(--text-dark);
             display: block;
             margin-bottom: 8px;
+            font-weight: 600;
         }
 
         .info-card p {
             font-size: 13px;
             color: var(--text-light);
             margin: 6px 0;
+        }
+
+        /* ===== DATA SECTION ===== */
+        .data-section {
+            margin-bottom: 35px;
+        }
+
+        .section-header {
+            font-size: 20px;
+            font-weight: 800;
+            color: var(--text-dark);
+            margin-bottom: 22px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding-bottom: 16px;
+            border-bottom: 2px solid var(--primary);
+        }
+
+        .section-header::before {
+            content: '';
+            width: 4px;
+            height: 24px;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            border-radius: 2px;
         }
 
         /* ===== RESPONSIVE ===== */
@@ -753,6 +866,10 @@ $health_overview = $conn->query("
                 gap: 15px;
                 border-radius: 12px;
                 flex-direction: column;
+            }
+
+            .welcome-section::before {
+                display: none;
             }
 
             .welcome-text h2 {
@@ -807,6 +924,15 @@ $health_overview = $conn->query("
             .main-content {
                 padding: 15px;
             }
+
+            .header-title {
+                font-size: 18px;
+            }
+
+            .export-btn {
+                padding: 10px 16px;
+                font-size: 12px;
+            }
         }
     </style>
 </head>
@@ -814,16 +940,22 @@ $health_overview = $conn->query("
     <!-- SIDEBAR -->
     <aside class="sidebar" id="sidebar">
         <div class="sidebar-header">
-            <span class="sidebar-logo">👨‍💼</span>
+            <span class="sidebar-logo">👨‍⚕️</span>
             <h2>SCHoRD</h2>
         </div>
         <ul class="sidebar-nav">
+            <div class="sidebar-section-label">Main</div>
             <li><a class="sidebar-link active" href="staff_dashboard.php"><span class="icon">📊</span> Dashboard</a></li>
-            <li><a class="sidebar-link" href="../pages/staff_students.php"><span class="icon">👥</span> Students</a></li>
+            
+            <div class="sidebar-section-label">Operation</div>
             <li><a class="sidebar-link" href="../pages/staff_visits.php"><span class="icon">📋</span> Clinic Visits</a></li>
-            <li><a class="sidebar-link" href="../pages/staff_health_records.php"><span class="icon">📄</span> Health Records</a></li>
+            <li><a class="sidebar-link" href="../pages/staff_patients.php"><span class="icon">👥</span> Patients</a></li>
+            <li><a class="sidebar-link" href="../pages/staff_health_records.php"><span class="icon">📝</span> Health Records</a></li>
+            
+            <div class="sidebar-section-label">Reporting</div>
             <li><a class="sidebar-link" href="../pages/staff_reports.php"><span class="icon">📈</span> Reports</a></li>
-            <li style="margin-top: 30px; border-top: 1px solid rgba(5, 150, 105, 0.15); padding-top: 20px;">
+            
+            <li class="sidebar-section">
                 <a class="sidebar-link" href="../auth/logout.php"><span class="icon">🚪</span> Logout</a>
             </li>
         </ul>
@@ -861,8 +993,8 @@ $health_overview = $conn->query("
             <!-- WELCOME SECTION -->
             <div class="welcome-section">
                 <div class="welcome-text">
-                    <h2>Welcome, <?php echo htmlspecialchars($user['name']); ?>! 👋</h2>
-                    <p>Manage student records and clinic operations</p>
+                    <h2>Welcome, <?php echo htmlspecialchars($user['name']); ?>! 🏥</h2>
+                    <p>Manage clinic operations and patient records efficiently</p>
                 </div>
                 <button class="export-btn" onclick="exportData()" title="Export Report">📥 Export Report</button>
             </div>
@@ -872,8 +1004,8 @@ $health_overview = $conn->query("
                 <div class="stat-card success">
                     <div class="stat-icon">👥</div>
                     <div class="stat-value"><?php echo $total_students; ?></div>
-                    <div class="stat-label">Total Students</div>
-                    <div class="stat-trend">📚 Active records</div>
+                    <div class="stat-label">Registered Patients</div>
+                    <div class="stat-trend">📚 Total in system</div>
                 </div>
 
                 <div class="stat-card info">
@@ -886,7 +1018,7 @@ $health_overview = $conn->query("
                 <div class="stat-card warning">
                     <div class="stat-icon">📅</div>
                     <div class="stat-value"><?php echo $this_month_visits; ?></div>
-                    <div class="stat-label">This Month's Visits</div>
+                    <div class="stat-label">This Month</div>
                     <div class="stat-trend">📊 Current period</div>
                 </div>
 
@@ -901,17 +1033,17 @@ $health_overview = $conn->query("
             <!-- QUICK ACTIONS -->
             <div class="section-header">🚀 Quick Actions</div>
             <div class="actions-grid">
-                <a href="../pages/staff_students.php" class="action-card">
-                    <span class="action-icon">➕</span>
-                    <span class="action-label">Add Student</span>
-                </a>
                 <a href="../pages/staff_visits.php" class="action-card">
-                    <span class="action-icon">📅</span>
+                    <span class="action-icon">➕</span>
                     <span class="action-label">Log Visit</span>
                 </a>
                 <a href="../pages/staff_health_records.php" class="action-card">
                     <span class="action-icon">📝</span>
                     <span class="action-label">Update Record</span>
+                </a>
+                <a href="../pages/staff_patients.php" class="action-card">
+                    <span class="action-icon">🏥</span>
+                    <span class="action-label">Check Patient</span>
                 </a>
                 <a href="../pages/staff_reports.php" class="action-card">
                     <span class="action-icon">📊</span>
@@ -921,13 +1053,13 @@ $health_overview = $conn->query("
 
             <!-- RECENT VISITS -->
             <div class="data-section">
-                <div class="section-header">📋 Recent Clinic Visits</div>
+                <div class="section-header">🏥 Recent Clinic Visits</div>
                 <div class="table-wrapper">
                     <table>
                         <thead>
                             <tr>
                                 <th>📅 Date/Time</th>
-                                <th>👤 Student Name</th>
+                                <th>👤 Patient Name</th>
                                 <th>🆔 ID</th>
                                 <th>📝 Complaint</th>
                                 <th>📊 Status</th>
@@ -956,18 +1088,18 @@ $health_overview = $conn->query("
                 </div>
             </div>
 
-            <!-- RECENT STUDENTS -->
+            <!-- RECENT PATIENTS -->
             <div class="data-section">
-                <div class="section-header">👥 Recent Student Admissions</div>
+                <div class="section-header">👥 Recent Patient Registrations</div>
                 <div class="table-wrapper">
                     <table>
                         <thead>
                             <tr>
-                                <th>👤 Student Name</th>
-                                <th>🆔 Admission ID</th>
+                                <th>👤 Patient Name</th>
+                                <th>🆔 Registration ID</th>
                                 <th>📚 Course</th>
-                                <th>🎂 Age</th>
                                 <th>📅 Registered</th>
+                                <th>📊 Status</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -979,14 +1111,14 @@ $health_overview = $conn->query("
                                     <td><strong><?php echo htmlspecialchars($student['name']); ?></strong></td>
                                     <td><?php echo htmlspecialchars($student['student_no']); ?></td>
                                     <td><?php echo htmlspecialchars($student['course'] ?? '—'); ?></td>
-                                    <td><?php echo htmlspecialchars($student['age'] ?? '—'); ?></td>
                                     <td><?php echo date('M d, Y', strtotime($student['created_at'], 0)); ?></td>
+                                    <td><span class="status-badge status-completed">Active</span></td>
                                 </tr>
                             <?php 
                                 endwhile;
                             else:
                             ?>
-                                <tr><td colspan="5" style="text-align: center; padding: 30px;">No recent admissions</td></tr>
+                                <tr><td colspan="5" style="text-align: center; padding: 30px;">No recent registrations</td></tr>
                             <?php endif; ?>
                         </tbody>
                     </table>
@@ -995,17 +1127,17 @@ $health_overview = $conn->query("
 
             <!-- HEALTH OVERVIEW -->
             <div class="data-section">
-                <div class="section-header">📊 Health Records Overview</div>
+                <div class="section-header">⚕️ Clinical Data Overview</div>
                 <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 18px;">
                     <div class="info-card">
                         <strong>📄 Total Health Records</strong>
-                        <p style="font-size: 18px; font-weight: 800; color: var(--primary); margin-top: 10px;"><?php echo $health_overview['total_records']; ?></strong></p>
+                        <p style="font-size: 18px; font-weight: 800; color: var(--primary); margin-top: 10px;"><?php echo $health_overview['total_records']; ?></p>
                         <p>Complete health documentation on file</p>
                     </div>
                     <div class="info-card">
                         <strong>❤️ Vital Signs Recorded</strong>
                         <p style="font-size: 18px; font-weight: 800; color: var(--primary); margin-top: 10px;"><?php echo $health_overview['records_with_bp']; ?></p>
-                        <p>Students with blood pressure readings</p>
+                        <p>Patients with vital signs data</p>
                     </div>
                     <div class="info-card">
                         <strong>📋 Data Completeness</strong>
@@ -1016,8 +1148,8 @@ $health_overview = $conn->query("
                                 : 0;
                             echo $percentage . '%';
                             ?>
-                        </strong></p>
-                        <p>Of health records have vital signs data</p>
+                        </p>
+                        <p>Records with complete vital signs</p>
                     </div>
                 </div>
             </div>
@@ -1038,71 +1170,138 @@ $health_overview = $conn->query("
                     link.classList.remove('active');
                 }
             });
+
+            // Add search functionality
+            const searchInput = document.querySelector('.search-box input');
+            if (searchInput) {
+                searchInput.addEventListener('input', function() {
+                    performSearch(this.value);
+                });
+            }
+
+            // Add data-searchable attribute to all tables and cards
+            document.querySelectorAll('table, .stat-card, .action-card, .info-card').forEach(el => {
+                el.setAttribute('data-searchable', 'true');
+            });
         });
 
-        // Menu Toggle
-        document.getElementById('menuToggle').addEventListener('click', function(e) {
-            e.stopPropagation();
-            document.getElementById('sidebar').classList.toggle('collapsed');
-            document.getElementById('mainWrapper').classList.toggle('sidebar-collapsed');
-        });
+        // Menu Toggle with error handling
+        const menuToggleBtn = document.getElementById('menuToggle');
+        if (menuToggleBtn) {
+            menuToggleBtn.addEventListener('click', function(e) {
+                e.stopPropagation();
+                const sidebar = document.getElementById('sidebar');
+                const mainWrapper = document.getElementById('mainWrapper');
+                if (sidebar) sidebar.classList.toggle('collapsed');
+                if (mainWrapper) mainWrapper.classList.toggle('sidebar-collapsed');
+            });
+        }
 
-        // Theme Toggle
-        document.getElementById('themeToggle').addEventListener('click', function() {
-            document.body.classList.toggle('dark-mode');
-            const isDark = document.body.classList.contains('dark-mode');
-            localStorage.setItem('theme', isDark ? 'dark' : 'light');
-            this.textContent = isDark ? '☀️' : '🌙';
-        });
+        // Theme Toggle with error handling
+        const themeToggleBtn = document.getElementById('themeToggle');
+        if (themeToggleBtn) {
+            themeToggleBtn.addEventListener('click', function() {
+                document.body.classList.toggle('dark-mode');
+                const isDark = document.body.classList.contains('dark-mode');
+                localStorage.setItem('theme', isDark ? 'dark' : 'light');
+                this.textContent = isDark ? '☀️' : '🌙';
+            });
+        }
 
-        // Load theme preference
+        // Load theme preference on page load
         window.addEventListener('load', function() {
             if (localStorage.getItem('theme') === 'dark') {
                 document.body.classList.add('dark-mode');
-                document.getElementById('themeToggle').textContent = '☀️';
+                const themeToggle = document.getElementById('themeToggle');
+                if (themeToggle) themeToggle.textContent = '☀️';
             }
         });
 
         // Export Data Function
         function exportData() {
-            const timestamp = new Date().toLocaleString();
-            const csvContent = [
-                ['SCHoRD Staff Dashboard Report'],
-                ['Generated:', timestamp],
-                [''],
-                ['Metric', 'Value'],
-                ['Total Students', '<?php echo $total_students; ?>'],
-                ['Total Clinic Visits', '<?php echo $total_visits; ?>'],
-                ['This Month\'s Visits', '<?php echo $this_month_visits; ?>'],
-                ['Health Records', '<?php echo $health_overview['total_records']; ?>']
-            ].map(row => row.join(',')).join('\n');
+            try {
+                const timestamp = new Date().toLocaleString();
+                const csvContent = [
+                    ['SCHoRD Staff Dashboard Report'],
+                    ['Generated:', timestamp],
+                    [''],
+                    ['Metric', 'Value'],
+                    ['Total Students', '<?php echo $total_students; ?>'],
+                    ['Total Clinic Visits', '<?php echo $total_visits; ?>'],
+                    ['This Month Visits', '<?php echo $this_month_visits; ?>'],
+                    ['Health Records', '<?php echo $health_overview['total_records']; ?>']
+                ].map(row => row.map(cell => '"' + String(cell).replace(/"/g, '""') + '"').join(',')).join('\n');
 
-            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-            const link = document.createElement('a');
-            link.setAttribute('href', URL.createObjectURL(blob));
-            link.setAttribute('download', `SCHoRD-Staff-Report-${new Date().getTime()}.csv`);
-            link.style.visibility = 'hidden';
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
+                const BOM = '\uFEFF';
+                const blob = new Blob([BOM + csvContent], { type: 'text/csv;charset=utf-8;' });
+                const link = document.createElement('a');
+                link.setAttribute('href', URL.createObjectURL(blob));
+                link.setAttribute('download', `SCHoRD-Staff-Report-${new Date().getTime()}.csv`);
+                link.style.visibility = 'hidden';
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
 
-            showNotification('📥 Report exported successfully!', 'success');
+                showNotification('✅ Report exported successfully!', 'success');
+            } catch (error) {
+                showNotification('❌ Error exporting report: ' + error.message, 'error');
+                console.error('Export error:', error);
+            }
         }
 
-        // Notification Helper
+        // Search Function
+        function performSearch(query) {
+            const lowerQuery = query.toLowerCase();
+            if (!query.trim()) {
+                document.querySelectorAll('[data-searchable="true"]').forEach(el => {
+                    el.style.display = '';
+                    el.style.opacity = '1';
+                    el.style.borderLeft = '';
+                    el.style.boxShadow = '';
+                });
+                return;
+            }
+
+            let matchCount = 0;
+            document.querySelectorAll('[data-searchable="true"]').forEach(el => {
+                const text = el.innerText.toLowerCase();
+                if (text.includes(lowerQuery)) {
+                    el.style.display = '';
+                    el.style.opacity = '1';
+                    el.style.borderLeft = '4px solid #10b981';
+                    el.style.boxShadow = '0 0 20px rgba(16, 185, 129, 0.3)';
+                    matchCount++;
+                } else {
+                    el.style.opacity = '0.3';
+                }
+            });
+            console.log(`Search: Found ${matchCount} matches for "${query}"`);
+        }
+
+        // Notification Helper with proper styling
         function showNotification(message, type = 'info') {
             const notification = document.createElement('div');
+            const bgColor = type === 'success' ? 'linear-gradient(135deg, #10b981, #059669)' :
+                           type === 'error' ? 'linear-gradient(135deg, #ef4444, #dc2626)' :
+                           'linear-gradient(135deg, #3b82f6, #2563eb)';
+            const shadow = type === 'error' ? '0 8px 24px rgba(239, 68, 68, 0.3)' :
+                          'rgba(16, 185, 129, 0.3)';
+                          
             notification.style.cssText = `
                 position: fixed;
                 top: 20px;
                 right: 20px;
-                background: linear-gradient(135deg, #059669, #10b981);
+                background: ${bgColor};
                 color: white;
                 padding: 16px 24px;
                 border-radius: 12px;
-                box-shadow: 0 8px 24px rgba(5, 150, 105, 0.3);
+                box-shadow: 0 8px 24px ${shadow};
                 z-index: 9999;
                 animation: slideInRight 0.3s ease;
+                font-weight: 600;
+                font-size: 14px;
+                max-width: 350px;
+                word-wrap: break-word;
             `;
             notification.textContent = message;
             document.body.appendChild(notification);
