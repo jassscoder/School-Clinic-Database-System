@@ -8,7 +8,11 @@ RUN apt-get update \
 
 WORKDIR /var/www/html
 COPY . /var/www/html
+COPY start-apache.sh /usr/local/bin/start-apache.sh
 
 RUN chown -R www-data:www-data /var/www/html
+RUN chmod +x /usr/local/bin/start-apache.sh
 
-EXPOSE 80
+EXPOSE 8080
+
+CMD ["/usr/local/bin/start-apache.sh"]
