@@ -1,4 +1,7 @@
 <?php
+// Return query errors as false results instead of uncaught exceptions.
+mysqli_report(MYSQLI_REPORT_OFF);
+
 // Database Configuration - prefer MYSQL_PUBLIC_URL, then Railway private vars, then local
 if ($url = getenv('MYSQL_PUBLIC_URL')) {
     // MYSQL_PUBLIC_URL contains full connection string: mysql://user:pass@host:port/db
@@ -129,6 +132,21 @@ function ensureCoreSchema($conn) {
             return;
         }
     }
+
+    // Backward/forward compatible schema adjustments for redesigned pages.
+    $columnChecks = [
+        "ALTER TABLE health_records ADD COLUMN chronic_conditions TEXT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL",
+        "ALTER TABLE health_records ADD COLUMN medications TEXT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL",
+        "ALTER TABLE health_records ADD COLUMN notes TEXT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL"
+    ];
+
+    foreach ($columnChecks as $alterSql) {
+        // Ignore duplicate column errors and keep moving.
+        $conn->query($alterSql);
+    }
+
+    // Ensure clinic status supports all values used by dashboards/pages.
+    $conn->query("ALTER TABLE clinic_visits MODIFY COLUMN status ENUM('pending','ongoing','completed') DEFAULT 'ongoing'");
 
     // Default admin account: admin@schord.com / admin123
     $adminPassword = '$2y$10$slYQmyNdGzIn9tdVyNo3Be63DlH.qVETVSMt.eoHxjAuxsQta7u.m';
