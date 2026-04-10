@@ -3,11 +3,20 @@
 if ($url = getenv('MYSQL_PUBLIC_URL')) {
     // MYSQL_PUBLIC_URL contains full connection string: mysql://user:pass@host:port/db
     $parts = parse_url($url);
-    $db_host = $parts['host'] ?? 'localhost';
-    $db_user = $parts['user'] ?? 'root';
-    $db_password = $parts['pass'] ?? '';
-    $db_name = isset($parts['path']) ? ltrim($parts['path'], '/') : 'schord_db';
-    $db_port = $parts['port'] ?? 3306;
+    if ($parts !== false && isset($parts['host'])) {
+        $db_host = $parts['host'];
+        $db_user = isset($parts['user']) ? rawurldecode($parts['user']) : 'root';
+        $db_password = isset($parts['pass']) ? rawurldecode($parts['pass']) : '';
+        $db_name = isset($parts['path']) ? ltrim(rawurldecode($parts['path']), '/') : 'schord_db';
+        $db_port = $parts['port'] ?? 3306;
+    } else {
+        // Fall back to Railway private vars if the public URL is malformed
+        $db_host = getenv('MYSQLHOST') ?: 'localhost';
+        $db_user = getenv('MYSQLUSER') ?: 'root';
+        $db_password = getenv('MYSQLPASSWORD') ?: '';
+        $db_name = getenv('MYSQLDATABASE') ?: 'schord_db';
+        $db_port = getenv('MYSQLPORT') ?: 3306;
+    }
 } elseif (getenv('MYSQLHOST')) {
     // Railway private environment variables
     $db_host = getenv('MYSQLHOST');
