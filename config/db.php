@@ -1,12 +1,32 @@
 <?php
-$conn = new mysqli("sql100.infinityfree.com", "if0_41606413", "sfjTodwktf", "if0_41606413_schord_db");
+// Database Configuration - Support both Railway and Local environments
+if (getenv('MYSQLHOST')) {
+    // Railway Production Environment
+    $db_host = getenv('MYSQLHOST');
+    $db_user = getenv('MYSQLUSER');
+    $db_password = getenv('MYSQLPASSWORD');
+    $db_name = getenv('MYSQLDATABASE');
+    $db_port = getenv('MYSQLPORT') ?: 3306;
+} else {
+    // Local Development Environment
+    $db_host = "localhost";
+    $db_user = "root";
+    $db_password = "";
+    $db_name = "schord_db";
+    $db_port = 3306;
+}
+
+$conn = new mysqli($db_host, $db_user, $db_password, $db_name, $db_port);
 
 if ($conn->connect_error) {
     die("Database Connection failed: " . $conn->connect_error);
 }
 
-// Set charset
-$conn->set_charset("utf8");
+// Set charset to UTF-8 (full unicode support)
+$conn->set_charset("utf8mb4");
+if (!$conn->query("SET NAMES utf8mb4")) {
+    error_log("Error setting charset: " . $conn->error);
+}
 
 /**
  * Sanitize input to prevent SQL injection
@@ -47,5 +67,143 @@ function getCurrentUser() {
 function isAdmin() {
     $user = getCurrentUser();
     return $user && $user['role'] === 'admin';
+}
+
+/**
+ * Generate a random 6-digit verification code
+ */
+function generateVerificationCode() {
+    return str_pad(random_int(0, 999999), 6, '0', STR_PAD_LEFT);
+}
+
+/**
+ * Send verification code to email
+ * Optimized for XAMPP with logging and error handling
+ */
+function sendVerificationEmail($email, $code) {
+    $subject = "SCHoRD Login Verification Code";
+    
+    $message = "
+    <html>
+        <head>
+            <style>
+                body { font-family: Arial, sans-serif; background-color: #f4f4f4; }
+                .container { max-width: 500px; margin: 0 auto; background-color: #fff; padding: 20px; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+                .header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 20px; text-align: center; border-radius: 5px; }
+                .header h1 { margin: 0; font-size: 24px; }
+                .content { padding: 20px; text-align: center; }
+                .code-box { background-color: #f0f0f0; border: 2px solid #667eea; padding: 15px; margin: 20px 0; border-radius: 5px; font-size: 32px; font-weight: bold; letter-spacing: 5px; color: #667eea; }
+                .footer { text-align: center; color: #999; font-size: 12px; margin-top: 20px; }
+                .warning { color: #d9534f; font-weight: bold; }
+            </style>
+        </head>
+        <body>
+            <div class='container'>
+                <div class='header'>
+                    <h1>🏥 SCHoRD - Login Verification</h1>
+                </div>
+                <div class='content'>
+                    <h2>Your Verification Code</h2>
+                    <p>Hello! Your Batangas State University School Health Record login verification code is:</p>
+                    <div class='code-box'>$code</div>
+                    <p>This code will expire in 15 minutes.</p>
+                    <p><span class='warning'>⚠️ Never share this code with anyone.</span></p>
+                    <p>If you didn't request this code, please ignore this email.</p>
+                </div>
+                <div class='footer'>
+                    <p>SCHoRD - School Health & Record Database<br>Batangas State University</p>
+                </div>
+            </div>
+        </body>
+    </html>
+    ";
+    
+    $headers = "MIME-Version: 1.0" . "\r\n";
+    $headers .= "Content-type: text/html; charset=UTF-8" . "\r\n";
+    $headers .= "From: noreply@schord.bsu.edu.ph" . "\r\n";
+    $headers .= "Reply-To: noreply@schord.bsu.edu.ph" . "\r\n";
+    
+    // Log the email attempt
+    $logFile = __DIR__ . '/../emails_log.txt';
+    $logEntry = date('Y-m-d H:i:s') . " | TO: $email | CODE: $code | SUBJECT: $subject\n";
+    @file_put_contents($logFile, $logEntry, FILE_APPEND);
+    
+    // Try to send email
+    $result = @mail($email, $subject, $message, $headers);
+    
+    // Log result
+    $resultLog = $result ? "SUCCESS" : "FAILED";
+    $resultEntry = date('Y-m-d H:i:s') . " | RESULT: $resultLog for $email\n";
+    @file_put_contents($logFile, $resultEntry, FILE_APPEND);
+    
+    return $result;
+}
+
+/**
+ * Get last 10 emails sent (for debugging on XAMPP)
+ */
+function getEmailLog() {
+    $logFile = __DIR__ . '/../emails_log.txt';
+    if (file_exists($logFile)) {
+        $content = file_get_contents($logFile);
+        // Return last 10 lines
+        $lines = array_slice(explode("\n", $content), -10);
+        return implode("\n", $lines);
+    }
+    return "No email log found yet.";
+}
+
+/**
+ * Create a verification code in the database
+ */
+function createVerificationCode($email) {
+    global $conn;
+    
+    // Generate code
+    $code = generateVerificationCode();
+    $expiresAt = date('Y-m-d H:i:s', strtotime('+15 minutes'));
+    
+    // Delete old codes for this email
+    $conn->query("DELETE FROM verification_codes WHERE email='".sanitize($email)."' AND expires_at < NOW()");
+    
+    // Insert new code
+    $result = $conn->query("INSERT INTO verification_codes (email, code, expires_at) VALUES ('".sanitize($email)."', '$code', '$expiresAt')");
+    
+    if ($result) {
+        return ['success' => true, 'code' => $code];
+    } else {
+        return ['success' => false, 'error' => 'Failed to create verification code'];
+    }
+}
+
+/**
+ * Verify a code entered by user
+ */
+function verifyCode($email, $code) {
+    global $conn;
+    
+    $email = sanitize($email);
+    $code = sanitize($code);
+    
+    // Check if code exists and is not expired
+    $result = $conn->query("SELECT id FROM verification_codes WHERE email='$email' AND code='$code' AND expires_at > NOW() AND attempt_count < 5");
+    
+    if ($result && $result->num_rows > 0) {
+        // Delete the used code
+        $conn->query("DELETE FROM verification_codes WHERE email='$email' AND code='$code'");
+        return ['success' => true];
+    } else {
+        // Increment attempt count
+        $conn->query("UPDATE verification_codes SET attempt_count = attempt_count + 1 WHERE email='$email' AND code='$code'");
+        return ['success' => false, 'error' => 'Invalid verification code'];
+    }
+}
+
+/**
+ * Clear expired verification codes
+ */
+function cleanupExpiredCodes() {
+    global $conn;
+    $conn->query("DELETE FROM verification_codes WHERE expires_at < NOW()");
 }
 ?>
