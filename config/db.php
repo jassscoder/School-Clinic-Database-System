@@ -62,7 +62,8 @@ function requireLogin() {
     }
     
     if (!isset($_SESSION['user'])) {
-        header("Location: index.php");
+        // Use an absolute path so redirects work from any subfolder (e.g. /dashboards, /pages).
+        header("Location: /auth/login.php");
         exit();
     }
 }
