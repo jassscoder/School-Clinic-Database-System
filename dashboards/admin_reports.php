@@ -112,11 +112,11 @@ $complaints = $conn->query("SELECT complaint, COUNT(*) as count FROM clinic_visi
                     <?php 
                     $comp_count = 0;
                     if ($complaints && $complaints->num_rows > 0): 
-                        while ($c = $complaints->fetch_assoc() && $comp_count < 10):
+                        while (($c = $complaints->fetch_assoc()) && $comp_count < 10):
                             $comp_count++;
                     ?>
                         <tr>
-                            <td><?php echo htmlspecialchars($c['complaint']); ?></td>
+                            <td><?php echo htmlspecialchars($c['complaint'] ?? 'N/A'); ?></td>
                             <td><strong><?php echo $c['count']; ?></strong></td>
                         </tr>
                     <?php 
