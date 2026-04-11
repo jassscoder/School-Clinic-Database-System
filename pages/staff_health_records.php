@@ -749,9 +749,20 @@ $students = $conn->query("SELECT id, name, student_no FROM students ORDER BY nam
             opacity: 0.8;
         }
 
+        .main-wrapper + footer {
+            margin-left: 280px;
+            text-align: center;
+            padding: 14px 20px;
+        }
+
+        .main-wrapper.sidebar-collapsed + footer {
+            margin-left: 0;
+        }
+
         @media (max-width: 768px) {
             .sidebar { display: none; }
             .main-wrapper { margin-left: 0; }
+            .main-wrapper + footer { margin-left: 0; }
         }
     </style>
 </head>
@@ -857,7 +868,7 @@ $students = $conn->query("SELECT id, name, student_no FROM students ORDER BY nam
                     </div>
                     <div class="form-group">
                         <label>Chronic Conditions</label>
-                        <textarea name="chronic_conditions"><?php echo $edit_record ? htmlspecialchars($edit_record['chronic_conditions']) : ''; ?></textarea>
+                        <textarea name="chronic_conditions"><?php echo $edit_record ? htmlspecialchars($edit_record['chronic_conditions'] ?? ($edit_record['conditions'] ?? '')) : ''; ?></textarea>
                     </div>
                     <div class="form-group">
                         <label>Medications</label>
@@ -892,8 +903,8 @@ $students = $conn->query("SELECT id, name, student_no FROM students ORDER BY nam
                                 <tr>
                                     <td><?php echo htmlspecialchars($record['name']); ?></td>
                                     <td><?php echo htmlspecialchars($record['blood_type']); ?></td>
-                                    <td><?php echo htmlspecialchars(substr($record['allergies'], 0, 30)); ?></td>
-                                    <td><?php echo htmlspecialchars(substr($record['chronic_conditions'], 0, 30)); ?></td>
+                                    <td><?php echo htmlspecialchars(substr((string)($record['allergies'] ?? ''), 0, 30)); ?></td>
+                                    <td><?php echo htmlspecialchars(substr((string)($record['chronic_conditions'] ?? ($record['conditions'] ?? '')), 0, 30)); ?></td>
                                     <td>
                                         <div class="actions">
                                             <a href="?edit=<?php echo $record['id']; ?>" class="action-btn action-edit">Edit</a>
