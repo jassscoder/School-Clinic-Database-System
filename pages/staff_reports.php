@@ -611,8 +611,6 @@ $top_students = $conn->query("SELECT s.name, COUNT(cv.id) as visit_count FROM st
             </div>
         </main>
 
-        <!-- FOOTER -->
-        <?php include('../includes/footer.php'); ?>
     </div>
 
     <script>
@@ -700,6 +698,5 @@ $top_students = $conn->query("SELECT s.name, COUNT(cv.id) as visit_count FROM st
             console.log('Dark mode active');
         }
     </script>
-</body>
-</html>
+    <?php include('../includes/footer.php'); ?>
 

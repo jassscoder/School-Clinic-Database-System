@@ -912,8 +912,6 @@ $students = $conn->query("SELECT id, name, student_no FROM students ORDER BY nam
             </div>
         </main>
 
-        <!-- FOOTER -->
-        <?php include('../includes/footer.php'); ?>
     </div>
 
     <script>
@@ -951,6 +949,5 @@ $students = $conn->query("SELECT id, name, student_no FROM students ORDER BY nam
             }
         });
     </script>
-</body>
-</html>
+    <?php include('../includes/footer.php'); ?>
 

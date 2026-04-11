@@ -929,8 +929,6 @@ $total_patients = $conn->query("SELECT COUNT(*) as count FROM students")->fetch_
             </div>
         </main>
 
-        <!-- FOOTER -->
-        <?php include('../includes/footer.php'); ?>
     </div>
 
     <script>
@@ -979,6 +977,5 @@ $total_patients = $conn->query("SELECT COUNT(*) as count FROM students")->fetch_
             }
         });
     </script>
-</body>
-</html>
+    <?php include('../includes/footer.php'); ?>
 

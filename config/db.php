@@ -168,12 +168,18 @@ function sanitize($input) {
  */
 function requireLogin() {
     if (session_status() === PHP_SESSION_NONE) {
-        session_start();
+        if (!headers_sent()) {
+            session_start();
+        }
     }
     
     if (!isset($_SESSION['user'])) {
         // Use an absolute path so redirects work from any subfolder (e.g. /dashboards, /pages).
-        header("Location: /auth/login.php");
+        if (!headers_sent()) {
+            header("Location: /auth/login.php");
+        } else {
+            echo '<script>window.location.href="/auth/login.php";</script>';
+        }
         exit();
     }
 }
@@ -183,7 +189,9 @@ function requireLogin() {
  */
 function getCurrentUser() {
     if (session_status() === PHP_SESSION_NONE) {
-        session_start();
+        if (!headers_sent()) {
+            session_start();
+        }
     }
     
     return isset($_SESSION['user']) ? $_SESSION['user'] : null;
