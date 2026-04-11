@@ -19,7 +19,7 @@ $search = isset($_GET['search']) ? sanitize($_GET['search']) : '';
 if ($search) {
     $patients = $conn->query("
         SELECT s.*, 
-               hr.blood_pressure, hr.temperature, hr.weight, hr.allergies, hr.conditions,
+               hr.blood_pressure, hr.temperature, hr.weight, hr.allergies, hr.chronic_conditions,
                COUNT(cv.id) as total_visits
         FROM students s 
         LEFT JOIN health_records hr ON s.id = hr.student_id 
@@ -31,7 +31,7 @@ if ($search) {
 } else {
     $patients = $conn->query("
         SELECT s.*, 
-               hr.blood_pressure, hr.temperature, hr.weight, hr.allergies, hr.conditions,
+               hr.blood_pressure, hr.temperature, hr.weight, hr.allergies, hr.chronic_conditions,
                COUNT(cv.id) as total_visits
         FROM students s 
         LEFT JOIN health_records hr ON s.id = hr.student_id 
@@ -39,6 +39,11 @@ if ($search) {
         GROUP BY s.id
         ORDER BY s.name ASC
     ");
+}
+
+if ($patients === false) {
+    $error = 'Failed to load patient records.';
+    error_log('nurse_patients.php query error: ' . $conn->error);
 }
 
 $total_patients = $conn->query("SELECT COUNT(*) as count FROM students")->fetch_assoc()['count'];
@@ -667,6 +672,7 @@ $total_patients = $conn->query("SELECT COUNT(*) as count FROM students")->fetch_
                         </tr>
                     </thead>
                     <tbody>
+                        <?php if ($patients && $patients->num_rows > 0): ?>
                         <?php while ($patient = $patients->fetch_assoc()): ?>
                             <tr>
                                 <td><strong><?php echo htmlspecialchars($patient['name']); ?></strong></td>
@@ -700,6 +706,13 @@ $total_patients = $conn->query("SELECT COUNT(*) as count FROM students")->fetch_
                                 </td>
                             </tr>
                         <?php endwhile; ?>
+                        <?php else: ?>
+                            <tr>
+                                <td colspan="9" style="text-align: center; color: var(--text-light);">
+                                    <?php echo htmlspecialchars($error ?: 'No patients found.'); ?>
+                                </td>
+                            </tr>
+                        <?php endif; ?>
                     </tbody>
                 </table>
             </div>
