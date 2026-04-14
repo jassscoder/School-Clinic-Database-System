@@ -98,13 +98,25 @@ if ($date_filter) {
 }
 
 $query .= " ORDER BY ns.schedule_date DESC";
-$schedules = $conn->query($query);
+// Safe query execution with error handling
+$schedules = false;
+$schedules_result = $conn->query($query);
+if ($schedules_result) {
+    $schedules = $schedules_result;
+}
 
-// Get statistics
-$total_schedules = $conn->query("SELECT COUNT(*) as count FROM nurse_schedules")->fetch_assoc()['count'];
-$pending_schedules = $conn->query("SELECT COUNT(*) as count FROM nurse_schedules WHERE status='pending'")->fetch_assoc()['count'];
-$completed_schedules = $conn->query("SELECT COUNT(*) as count FROM nurse_schedules WHERE status='completed'")->fetch_assoc()['count'];
-$high_priority = $conn->query("SELECT COUNT(*) as count FROM nurse_schedules WHERE priority='high' AND status='pending'")->fetch_assoc()['count'];
+// Get statistics - safely handle potential query failures
+$total_result = $conn->query("SELECT COUNT(*) as count FROM nurse_schedules");
+$total_schedules = ($total_result && $total_result->num_rows > 0) ? $total_result->fetch_assoc()['count'] : 0;
+
+$pending_result = $conn->query("SELECT COUNT(*) as count FROM nurse_schedules WHERE status='pending'");
+$pending_schedules = ($pending_result && $pending_result->num_rows > 0) ? $pending_result->fetch_assoc()['count'] : 0;
+
+$completed_result = $conn->query("SELECT COUNT(*) as count FROM nurse_schedules WHERE status='completed'");
+$completed_schedules = ($completed_result && $completed_result->num_rows > 0) ? $completed_result->fetch_assoc()['count'] : 0;
+
+$high_priority_result = $conn->query("SELECT COUNT(*) as count FROM nurse_schedules WHERE priority='high' AND status='pending'");
+$high_priority = ($high_priority_result && $high_priority_result->num_rows > 0) ? $high_priority_result->fetch_assoc()['count'] : 0;
 
 // Get all students for dropdown
 $students = $conn->query("SELECT id, name, student_no FROM students ORDER BY name ASC");

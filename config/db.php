@@ -48,6 +48,29 @@ if (!$conn->query("SET NAMES utf8mb4")) {
     error_log("Error setting charset: " . $conn->error);
 }
 
+// Ensure nurse_schedules table exists (independent of ensureCoreSchema)
+$tableCheck = $conn->query("SHOW TABLES LIKE 'nurse_schedules'");
+if (!$tableCheck || $tableCheck->num_rows == 0) {
+    $createScheduleTable = "CREATE TABLE IF NOT EXISTS nurse_schedules (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        student_id INT NOT NULL,
+        schedule_date DATETIME NOT NULL,
+        reason VARCHAR(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+        priority ENUM('low','normal','high') DEFAULT 'normal',
+        notes TEXT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
+        status ENUM('pending','completed','cancelled') DEFAULT 'pending',
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+        FOREIGN KEY (student_id) REFERENCES students(id) ON DELETE CASCADE,
+        KEY (schedule_date),
+        KEY (status)
+    ) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci";
+    
+    if (!$conn->query($createScheduleTable)) {
+        error_log("Error creating nurse_schedules table: " . $conn->error);
+    }
+}
+
 /**
  * Ensure required core tables exist in the currently selected database.
  * This allows first-run Railway environments to self-initialize.
