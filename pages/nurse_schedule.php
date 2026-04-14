@@ -17,12 +17,12 @@ $edit_schedule = null;
 
 // Add or Update Schedule
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    $student_id = sanitize($_POST['student_id'] ?? '');
-    $schedule_date = sanitize($_POST['schedule_date'] ?? '');
-    $schedule_time = sanitize($_POST['schedule_time'] ?? '');
-    $reason = sanitize($_POST['reason'] ?? '');
-    $priority = sanitize($_POST['priority'] ?? 'normal');
-    $notes = sanitize($_POST['notes'] ?? '');
+    $student_id = isset($_POST['student_id']) ? sanitize($_POST['student_id']) : '';
+    $schedule_date = isset($_POST['schedule_date']) ? sanitize($_POST['schedule_date']) : '';
+    $schedule_time = isset($_POST['schedule_time']) ? sanitize($_POST['schedule_time']) : '';
+    $reason = isset($_POST['reason']) ? sanitize($_POST['reason']) : '';
+    $priority = isset($_POST['priority']) ? sanitize($_POST['priority']) : 'normal';
+    $notes = isset($_POST['notes']) ? sanitize($_POST['notes']) : '';
 
     if (empty($student_id) || empty($schedule_date) || empty($schedule_time) || empty($reason)) {
         $error = '❌ All required fields must be filled';
@@ -108,6 +108,12 @@ $high_priority = $conn->query("SELECT COUNT(*) as count FROM nurse_schedules WHE
 
 // Get all students for dropdown
 $students = $conn->query("SELECT id, name, student_no FROM students ORDER BY name ASC");
+$students_data = [];
+if ($students && $students->num_rows > 0) {
+    while ($row = $students->fetch_assoc()) {
+        $students_data[] = $row;
+    }
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -543,12 +549,12 @@ $students = $conn->query("SELECT id, name, student_no FROM students ORDER BY nam
                             <label for="student_id">Student *</label>
                             <select name="student_id" id="student_id" required>
                                 <option value="">-- Select Student --</option>
-                                <?php while ($student = $students->fetch_assoc()): ?>
+                                <?php foreach ($students_data as $student): ?>
                                     <option value="<?php echo $student['id']; ?>" 
                                         <?php echo ($edit_schedule && $edit_schedule['student_id'] == $student['id']) ? 'selected' : ''; ?>>
                                         <?php echo htmlspecialchars($student['name'] . ' (' . $student['student_no'] . ')'); ?>
                                     </option>
-                                <?php endwhile; ?>
+                                <?php endforeach; ?>
                             </select>
                         </div>
 
