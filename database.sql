@@ -50,6 +50,22 @@ CREATE TABLE IF NOT EXISTS clinic_visits (
     FOREIGN KEY (student_id) REFERENCES students(id) ON DELETE CASCADE
 ) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
+-- Create nurse_schedules table for scheduling appointments
+CREATE TABLE IF NOT EXISTS nurse_schedules (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    student_id INT NOT NULL,
+    schedule_date DATETIME NOT NULL,
+    reason VARCHAR(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+    priority ENUM('low','normal','high') DEFAULT 'normal',
+    notes TEXT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
+    status ENUM('pending','completed','cancelled') DEFAULT 'pending',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (student_id) REFERENCES students(id) ON DELETE CASCADE,
+    KEY (schedule_date),
+    KEY (status)
+) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
 -- Create settings table for site configuration
 CREATE TABLE IF NOT EXISTS settings (
     id INT AUTO_INCREMENT PRIMARY KEY,

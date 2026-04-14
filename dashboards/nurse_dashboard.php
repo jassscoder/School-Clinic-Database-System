@@ -824,6 +824,7 @@ $health_alerts = $conn->query("
             <li><a class="sidebar-link active" href="nurse_dashboard.php"><span class="icon">📊</span> Dashboard</a></li>
             <li><a class="sidebar-link" href="../pages/nurse_patients.php"><span class="icon">👥</span> Patients</a></li>
             <li><a class="sidebar-link" href="../pages/nurse_visits.php"><span class="icon">📋</span> Visits</a></li>
+            <li><a class="sidebar-link" href="../pages/nurse_schedule.php"><span class="icon">📅</span> Schedules</a></li>
             <li><a class="sidebar-link" href="../pages/nurse_health_records.php"><span class="icon">❤️</span> Health Records</a></li>
             <li><a class="sidebar-link" href="../pages/nurse_reports.php"><span class="icon">📈</span> Reports</a></li>
             <li style="margin-top: 30px; border-top: 1px solid rgba(6, 182, 212, 0.15); padding-top: 20px;">
