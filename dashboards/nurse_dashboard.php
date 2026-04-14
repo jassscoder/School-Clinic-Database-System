@@ -15,11 +15,18 @@ if (strtolower($user['role']) !== 'nurse') {
     exit();
 }
 
-// Get statistics
-$total_patients = $conn->query("SELECT COUNT(*) as count FROM students")->fetch_assoc()['count'];
-$today_visits = $conn->query("SELECT COUNT(*) as count FROM clinic_visits WHERE DATE(visit_date) = CURDATE()")->fetch_assoc()['count'];
-$pending_visits = $conn->query("SELECT COUNT(*) as count FROM clinic_visits WHERE status='pending'")->fetch_assoc()['count'];
-$critical_patients = $conn->query("SELECT COUNT(*) as count FROM health_records WHERE blood_pressure IS NOT NULL")->fetch_assoc()['count'];
+// Get statistics with safe error handling
+$result = $conn->query("SELECT COUNT(*) as count FROM students");
+$total_patients = ($result && $result->num_rows > 0) ? $result->fetch_assoc()['count'] : 0;
+
+$result = $conn->query("SELECT COUNT(*) as count FROM clinic_visits WHERE DATE(visit_date) = CURDATE()");
+$today_visits = ($result && $result->num_rows > 0) ? $result->fetch_assoc()['count'] : 0;
+
+$result = $conn->query("SELECT COUNT(*) as count FROM clinic_visits WHERE status='pending'");
+$pending_visits = ($result && $result->num_rows > 0) ? $result->fetch_assoc()['count'] : 0;
+
+$result = $conn->query("SELECT COUNT(*) as count FROM health_records WHERE blood_pressure IS NOT NULL");
+$critical_patients = ($result && $result->num_rows > 0) ? $result->fetch_assoc()['count'] : 0;
 
 // Get today's appointments
 $today_appointments = $conn->query("
@@ -969,16 +976,17 @@ $health_alerts = $conn->query("
                     <?php 
                     $alert_count = 0;
                     if ($health_alerts && $health_alerts->num_rows > 0):
-                        while ($alert = $health_alerts->fetch_assoc() && $alert_count < 6): 
+                        while ($alert = $health_alerts->fetch_assoc()): 
+                            if ($alert_count >= 6) break;
                             $alert_count++;
                     ?>
                         <div class="alert-card">
-                            <strong>👤 <?php echo htmlspecialchars($alert['name']); ?></strong>
-                            <p><strong>ID:</strong> <?php echo htmlspecialchars($alert['admission_number']); ?></p>
-                            <?php if($alert['allergies']): ?>
+                            <strong>👤 <?php echo htmlspecialchars($alert['name'] ?? 'Unknown'); ?></strong>
+                            <p><strong>ID:</strong> <?php echo htmlspecialchars($alert['admission_number'] ?? 'N/A'); ?></p>
+                            <?php if(!empty($alert['allergies'])): ?>
                                 <p><strong>🚫 Allergies:</strong> <?php echo htmlspecialchars($alert['allergies']); ?></p>
                             <?php endif; ?>
-                            <?php if($alert['medical_conditions']): ?>
+                            <?php if(!empty($alert['medical_conditions'])): ?>
                                 <p><strong>⚕️ Conditions:</strong> <?php echo htmlspecialchars($alert['medical_conditions']); ?></p>
                             <?php endif; ?>
                         </div>
