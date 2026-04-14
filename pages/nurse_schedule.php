@@ -75,7 +75,7 @@ if (isset($_POST['update_status'])) {
 if (isset($_GET['edit'])) {
     $id = sanitize($_GET['edit']);
     $result = $conn->query("SELECT * FROM nurse_schedules WHERE id='$id'");
-    if ($result->num_rows > 0) {
+    if ($result && $result->num_rows > 0) {
         $edit_schedule = $result->fetch_assoc();
     }
 }
@@ -600,7 +600,7 @@ if ($students && $students->num_rows > 0) {
 
                         <div class="form-group">
                             <label for="notes">Additional Notes</label>
-                            <textarea name="notes" id="notes" placeholder="Any additional notes..."><?php echo $edit_schedule ? htmlspecialchars($edit_schedule['notes']) : ''; ?></textarea>
+                            <textarea name="notes" id="notes" placeholder="Any additional notes..."><?php echo ($edit_schedule && !empty($edit_schedule['notes'])) ? htmlspecialchars($edit_schedule['notes']) : ''; ?></textarea>
                         </div>
 
                         <div class="button-group">
@@ -637,27 +637,27 @@ if ($students && $students->num_rows > 0) {
                     <div class="schedule-list">
                         <?php if ($schedules && $schedules->num_rows > 0): ?>
                             <?php while ($schedule = $schedules->fetch_assoc()): ?>
-                                <div class="schedule-item <?php echo $schedule['priority'] == 'high' ? 'high-priority' : ''; ?> <?php echo $schedule['status'] == 'completed' ? 'completed' : ''; ?>">
+                                <div class="schedule-item <?php echo ($schedule['priority'] ?? 'normal') == 'high' ? 'high-priority' : ''; ?> <?php echo ($schedule['status'] ?? 'pending') == 'completed' ? 'completed' : ''; ?>">
                                     <div class="schedule-header">
                                         <div class="schedule-title">
-                                            🏥 <?php echo htmlspecialchars($schedule['name']); ?>
+                                            🏥 <?php echo htmlspecialchars($schedule['name'] ?? 'Unknown'); ?>
                                             <span style="color: var(--text-light); font-weight: 400; font-size: 12px;">
-                                                (<?php echo htmlspecialchars($schedule['student_no']); ?>)
+                                                (<?php echo htmlspecialchars($schedule['student_no'] ?? 'N/A'); ?>)
                                             </span>
                                         </div>
                                         <div>
-                                            <span class="priority-badge <?php echo $schedule['priority']; ?>">
-                                                <?php echo ucfirst($schedule['priority']); ?>
+                                            <span class="priority-badge <?php echo $schedule['priority'] ?? 'normal'; ?>">
+                                                <?php echo ucfirst($schedule['priority'] ?? 'normal'); ?>
                                             </span>
-                                            <span class="status-badge <?php echo $schedule['status']; ?>">
-                                                <?php echo ucfirst($schedule['status']); ?>
+                                            <span class="status-badge <?php echo $schedule['status'] ?? 'pending'; ?>">
+                                                <?php echo ucfirst($schedule['status'] ?? 'pending'); ?>
                                             </span>
                                         </div>
                                     </div>
                                     <div class="schedule-details">
-                                        <strong>Reason:</strong> <?php echo htmlspecialchars($schedule['reason']); ?><br>
-                                        <strong>Date & Time:</strong> <?php echo date('M d, Y - g:i A', strtotime($schedule['schedule_date'])); ?><br>
-                                        <?php if ($schedule['notes']): ?>
+                                        <strong>Reason:</strong> <?php echo htmlspecialchars($schedule['reason'] ?? 'N/A'); ?><br>
+                                        <strong>Date & Time:</strong> <?php echo date('M d, Y - g:i A', strtotime($schedule['schedule_date'] ?? '2026-01-01 00:00:00')); ?><br>
+                                        <?php if (!empty($schedule['notes'])): ?>
                                             <strong>Notes:</strong> <?php echo htmlspecialchars($schedule['notes']); ?><br>
                                         <?php endif; ?>
                                     </div>
