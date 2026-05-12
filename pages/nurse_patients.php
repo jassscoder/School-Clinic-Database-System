@@ -13,13 +13,50 @@ if (strtolower($user['role']) !== 'nurse') {
 
 $success = '';
 $error = '';
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_patient'])) {
+    $student_no = sanitize($_POST['student_no'] ?? '');
+    $name = sanitize($_POST['name'] ?? '');
+    $course = sanitize($_POST['course'] ?? '');
+    $age = sanitize($_POST['age'] ?? '');
+
+    if ($student_no === '' || $name === '' || $course === '' || $age === '') {
+        $error = '❌ All fields are required';
+    } elseif (!is_numeric($age) || (int)$age < 1 || (int)$age > 100) {
+        $error = '❌ Age must be between 1 and 100';
+    } else {
+        $check = $conn->query("SELECT id FROM students WHERE student_no='$student_no'");
+        if ($check && $check->num_rows > 0) {
+            $error = '❌ Student number already exists';
+        } else {
+            $ageValue = (int)$age;
+            if ($conn->query("INSERT INTO students (student_no, name, course, age) VALUES ('$student_no', '$name', '$course', $ageValue)")) {
+                $success = '✅ Patient added successfully!';
+                $_POST = [];
+                header("Location: nurse_patients.php?added=1");
+                exit();
+            } else {
+                $error = '❌ Error adding patient';
+                // Log detailed DB error for troubleshooting on local XAMPP
+                @mkdir(__DIR__ . '/../logs', 0777, true);
+                $logMessage = date('Y-m-d H:i:s') . " | nurse_patients.php INSERT ERROR: " . $conn->error . "\n";
+                @file_put_contents(__DIR__ . '/../logs/db_errors.txt', $logMessage, FILE_APPEND);
+                error_log('nurse_patients.php INSERT ERROR: ' . $conn->error);
+            }
+        }
+    }
+}
+
+if (isset($_GET['added'])) {
+    $success = '✅ Patient added successfully!';
+}
 $search = isset($_GET['search']) ? sanitize($_GET['search']) : '';
 
 // Get all patients with their latest health records
 if ($search) {
     $patients = $conn->query("
-        SELECT s.*, 
-               hr.blood_pressure, hr.temperature, hr.weight, hr.allergies, hr.chronic_conditions,
+         SELECT s.*, 
+             hr.blood_pressure, hr.temperature, hr.weight, hr.allergies,
                COUNT(cv.id) as total_visits
         FROM students s 
         LEFT JOIN health_records hr ON s.id = hr.student_id 
@@ -31,7 +68,7 @@ if ($search) {
 } else {
     $patients = $conn->query("
         SELECT s.*, 
-               hr.blood_pressure, hr.temperature, hr.weight, hr.allergies, hr.chronic_conditions,
+               hr.blood_pressure, hr.temperature, hr.weight, hr.allergies,
                COUNT(cv.id) as total_visits
         FROM students s 
         LEFT JOIN health_records hr ON s.id = hr.student_id 
@@ -334,6 +371,27 @@ $total_patients = $conn->query("SELECT COUNT(*) as count FROM students")->fetch_
             border-color: var(--primary);
         }
 
+        .alert {
+            padding: 16px 18px;
+            border-radius: 14px;
+            margin-bottom: 22px;
+            font-weight: 600;
+            border: 1px solid transparent;
+            box-shadow: var(--shadow);
+        }
+
+        .alert-success {
+            background: rgba(16, 185, 129, 0.12);
+            border-color: rgba(16, 185, 129, 0.25);
+            color: var(--primary-dark);
+        }
+
+        .alert-danger {
+            background: rgba(239, 68, 68, 0.10);
+            border-color: rgba(239, 68, 68, 0.20);
+            color: #b91c1c;
+        }
+
         /* ===== MAIN CONTENT AREA ===== */
         .main-content {
             padding: 35px;
@@ -435,6 +493,109 @@ $total_patients = $conn->query("SELECT COUNT(*) as count FROM students")->fetch_
             border: 1px solid rgba(255, 255, 255, 0.8);
             overflow: hidden;
             margin-top: 20px;
+        }
+
+        .form-panel {
+            background: linear-gradient(135deg, var(--bg-card) 0%, rgba(255, 255, 255, 0.72) 100%);
+            backdrop-filter: blur(10px);
+            border-radius: 16px;
+            box-shadow: var(--shadow-lg);
+            border: 1px solid rgba(255, 255, 255, 0.8);
+            padding: 24px;
+            margin: 20px 0 35px;
+        }
+
+        body.dark-mode .form-panel {
+            background: linear-gradient(135deg, var(--bg-card) 0%, rgba(8, 47, 73, 0.8) 100%);
+            border-color: rgba(6, 182, 212, 0.1);
+        }
+
+        .form-panel-header {
+            margin-bottom: 18px;
+        }
+
+        .form-panel-title {
+            font-size: 20px;
+            font-weight: 800;
+            color: var(--text-dark);
+            letter-spacing: -0.5px;
+        }
+
+        .form-panel-subtitle {
+            margin-top: 6px;
+            color: var(--text-light);
+            font-size: 14px;
+        }
+
+        .patient-form {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 18px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .form-group label {
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--text-dark);
+            letter-spacing: 0.2px;
+        }
+
+        .form-group input {
+            width: 100%;
+            border-radius: 12px;
+            border: 1px solid rgba(6, 182, 212, 0.18);
+            padding: 13px 14px;
+            background: rgba(255, 255, 255, 0.75);
+            color: var(--text-dark);
+            outline: none;
+            transition: all 0.25s ease;
+        }
+
+        body.dark-mode .form-group input {
+            background: rgba(8, 47, 73, 0.5);
+            border-color: rgba(6, 182, 212, 0.22);
+        }
+
+        .form-group input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px rgba(6, 182, 212, 0.12);
+        }
+
+        .form-actions {
+            grid-column: 1 / -1;
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            justify-content: flex-start;
+            flex-wrap: wrap;
+        }
+
+        .submit-btn {
+            border: none;
+            border-radius: 12px;
+            padding: 13px 18px;
+            font-weight: 800;
+            cursor: pointer;
+            color: white;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+            box-shadow: 0 14px 30px rgba(6, 182, 212, 0.22);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 18px 36px rgba(6, 182, 212, 0.28);
+        }
+
+        .form-note {
+            color: var(--text-light);
+            font-size: 13px;
         }
 
         body.dark-mode .table-wrapper {
@@ -645,6 +806,49 @@ $total_patients = $conn->query("SELECT COUNT(*) as count FROM students")->fetch_
             <!-- PAGE HEADER -->
             <div class="page-header">
                 <h1>Patient Records</h1>
+            </div>
+
+            <?php if ($success): ?>
+                <div class="alert alert-success"><?php echo htmlspecialchars($success); ?></div>
+            <?php endif; ?>
+            <?php if ($error): ?>
+                <div class="alert alert-danger"><?php echo htmlspecialchars($error); ?></div>
+            <?php endif; ?>
+
+            <div class="form-panel" id="addPatientForm">
+                <div class="form-panel-header">
+                    <div class="form-panel-title">Add New Patient</div>
+                    <div class="form-panel-subtitle">Saved directly to the shared students table and reflected across the dashboard, visits, and health records.</div>
+                </div>
+
+                <form method="POST" class="patient-form" autocomplete="off">
+                    <input type="hidden" name="add_patient" value="1">
+
+                    <div class="form-group">
+                        <label for="student_no">Student Number</label>
+                        <input type="text" id="student_no" name="student_no" value="<?php echo htmlspecialchars($_POST['student_no'] ?? ''); ?>" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="name">Full Name</label>
+                        <input type="text" id="name" name="name" value="<?php echo htmlspecialchars($_POST['name'] ?? ''); ?>" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="course">Course</label>
+                        <input type="text" id="course" name="course" value="<?php echo htmlspecialchars($_POST['course'] ?? ''); ?>" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="age">Age</label>
+                        <input type="number" id="age" name="age" min="1" max="100" value="<?php echo htmlspecialchars($_POST['age'] ?? ''); ?>" required>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="submit" class="submit-btn">Save Patient</button>
+                        <span class="form-note">New patients will immediately appear in the table below.</span>
+                    </div>
+                </form>
             </div>
 
             <!-- STATS -->

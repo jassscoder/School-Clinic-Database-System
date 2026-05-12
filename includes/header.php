@@ -2,6 +2,11 @@
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
+// Determine correct asset path for stylesheet when included from subfolders
+$assetHref = 'assets/style.css';
+if (strpos($_SERVER['PHP_SELF'], '/auth/') !== false || strpos($_SERVER['PHP_SELF'], '/dashboards/') !== false || strpos($_SERVER['PHP_SELF'], '/pages/') !== false) {
+    $assetHref = '../assets/style.css';
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -9,7 +14,7 @@ if (session_status() === PHP_SESSION_NONE) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SCHoRD - School Health & Record Database</title>
-    <link rel="stylesheet" href="<?php echo (strpos($_SERVER['PHP_SELF'], '/auth/') !== false) ? '../assets/style.css' : 'assets/style.css'; ?>">
+    <link rel="stylesheet" href="<?php echo $assetHref; ?>">
 </head>
 <body>
     <?php if (isset($_SESSION['user'])): ?>
@@ -48,3 +53,19 @@ if (session_status() === PHP_SESSION_NONE) {
         </ul>
     </nav>
     <?php endif; ?>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            if (localStorage.getItem('theme') === 'dark') {
+                document.body.classList.add('dark-mode');
+            }
+
+            const themeBtn = document.getElementById('themeToggle');
+            if (themeBtn) {
+                themeBtn.addEventListener('click', function() {
+                    document.body.classList.toggle('dark-mode');
+                    const isDark = document.body.classList.contains('dark-mode');
+                    localStorage.setItem('theme', isDark ? 'dark' : 'light');
+                });
+            }
+        });
+    </script>

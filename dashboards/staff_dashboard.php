@@ -17,6 +17,66 @@ if (strtolower($user['role']) !== 'staff') {
     exit();
 }
 
+$success = '';
+$error = '';
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_patient'])) {
+    $student_no = sanitize($_POST['student_no'] ?? '');
+    $name = sanitize($_POST['name'] ?? '');
+    $course = sanitize($_POST['course'] ?? '');
+    $age = sanitize($_POST['age'] ?? '');
+
+    if ($student_no === '' || $name === '' || $course === '' || $age === '') {
+        $error = '❌ All fields are required';
+    } elseif (!is_numeric($age) || (int)$age < 1 || (int)$age > 100) {
+        $error = '❌ Age must be between 1 and 100';
+    } else {
+        $check = $conn->query("SELECT id FROM students WHERE student_no='$student_no'");
+        if ($check && $check->num_rows > 0) {
+            $error = '❌ Student number already exists';
+        } else {
+            $ageValue = (int)$age;
+            if ($conn->query("INSERT INTO students (student_no, name, course, age) VALUES ('$student_no', '$name', '$course', $ageValue)")) {
+                $success = '✅ Patient added successfully! The dashboard has been updated.';
+                $_POST = [];
+            } else {
+                $error = '❌ Error adding patient';
+                // Log DB error for troubleshooting
+                @mkdir(__DIR__ . '/../logs', 0777, true);
+                $logMessage = date('Y-m-d H:i:s') . " | staff_dashboard.php INSERT ERROR: " . $conn->error . "\n";
+                @file_put_contents(__DIR__ . '/../logs/db_errors.txt', $logMessage, FILE_APPEND);
+                error_log('staff_dashboard.php INSERT ERROR: ' . $conn->error);
+            }
+        }
+    }
+}
+
+// Quick Add Health Record from dashboard
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_health_record'])) {
+    $student_id = sanitize($_POST['student_id'] ?? '');
+    $blood_type = sanitize($_POST['blood_type'] ?? '');
+    $allergies = sanitize($_POST['allergies'] ?? '');
+    $chronic_conditions = sanitize($_POST['chronic_conditions'] ?? '');
+    $medications = sanitize($_POST['medications'] ?? '');
+    $notes = sanitize($_POST['notes'] ?? '');
+
+    if ($student_id === '') {
+        $error = '❌ Student is required for health record';
+    } else {
+        $sql = "INSERT INTO health_records (student_id, blood_type, allergies, chronic_conditions, medications, notes) VALUES ('$student_id', '$blood_type', '$allergies', '$chronic_conditions', '$medications', '$notes')";
+        if ($conn->query($sql)) {
+            $success = '✅ Health record saved successfully!';
+            $_POST = [];
+        } else {
+            $error = '❌ Error saving health record';
+            @mkdir(__DIR__ . '/../logs', 0777, true);
+            $logMessage = date('Y-m-d H:i:s') . " | staff_dashboard.php HEALTH INSERT ERROR: " . $conn->error . "\n";
+            @file_put_contents(__DIR__ . '/../logs/db_errors.txt', $logMessage, FILE_APPEND);
+            error_log('staff_dashboard.php HEALTH INSERT ERROR: ' . $conn->error);
+        }
+    }
+}
+
 // Get statistics
 $total_students = $conn->query("SELECT COUNT(*) as count FROM students")->fetch_assoc()['count'];
 $total_visits = $conn->query("SELECT COUNT(*) as count FROM clinic_visits")->fetch_assoc()['count'];
@@ -30,6 +90,9 @@ $recent_students = $conn->query("
     ORDER BY s.created_at DESC
     LIMIT 8
 ");
+
+// Load students list for quick actions/forms
+$students = $conn->query("SELECT id, name, student_no FROM students ORDER BY name ASC");
 
 // Get recent visits
 $recent_visits = $conn->query("
@@ -319,6 +382,27 @@ $health_overview = $conn->query("
             display: flex;
             align-items: center;
             gap: 20px;
+        }
+
+        .alert {
+            padding: 16px 18px;
+            border-radius: 14px;
+            margin-bottom: 22px;
+            font-weight: 600;
+            border: 1px solid transparent;
+            box-shadow: var(--shadow);
+        }
+
+        .alert-success {
+            background: rgba(16, 185, 129, 0.12);
+            border-color: rgba(16, 185, 129, 0.25);
+            color: var(--primary-dark);
+        }
+
+        .alert-danger {
+            background: rgba(239, 68, 68, 0.10);
+            border-color: rgba(239, 68, 68, 0.20);
+            color: #b91c1c;
         }
 
         .search-box {
@@ -706,6 +790,130 @@ $health_overview = $conn->query("
             border-color: rgba(16, 185, 129, 0.1);
         }
 
+        .form-panel {
+            background: linear-gradient(135deg, var(--bg-card) 0%, rgba(255, 255, 255, 0.72) 100%);
+            border-radius: 20px;
+            padding: 24px;
+            box-shadow: var(--shadow-lg);
+            border: 1px solid rgba(255, 255, 255, 0.8);
+            margin-bottom: 35px;
+        }
+
+        body.dark-mode .form-panel {
+            background: linear-gradient(135deg, var(--bg-card) 0%, rgba(6, 78, 59, 0.84) 100%);
+            border-color: rgba(16, 185, 129, 0.1);
+        }
+
+        .form-panel-header {
+            margin-bottom: 18px;
+        }
+
+        .form-panel-title {
+            font-size: 20px;
+            font-weight: 800;
+            color: var(--text-dark);
+            letter-spacing: -0.4px;
+        }
+
+        .form-panel-subtitle {
+            margin-top: 6px;
+            color: var(--text-light);
+            font-size: 14px;
+        }
+
+        .patient-form {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 18px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .form-group label {
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--text-dark);
+            letter-spacing: 0.2px;
+        }
+
+        .form-group input {
+            width: 100%;
+            border-radius: 12px;
+            border: 1px solid rgba(16, 185, 129, 0.18);
+            padding: 13px 14px;
+            background: rgba(255, 255, 255, 0.75);
+            color: var(--text-dark);
+            outline: none;
+            transition: all 0.25s ease;
+        }
+
+        .form-group select {
+            width: 100%;
+            border-radius: 12px;
+            border: 1px solid rgba(16, 185, 129, 0.18);
+            padding: 13px 14px;
+            background: rgba(255, 255, 255, 0.75);
+            color: var(--text-dark);
+            outline: none;
+            transition: all 0.25s ease;
+            font-family: inherit;
+        }
+
+        body.dark-mode .form-group input {
+            background: rgba(2, 44, 29, 0.5);
+            border-color: rgba(16, 185, 129, 0.22);
+        }
+
+        body.dark-mode .form-group select {
+            background: rgba(2, 44, 29, 0.5);
+            border-color: rgba(16, 185, 129, 0.22);
+        }
+
+        .form-group input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.12);
+        }
+
+        .form-group select:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.12);
+        }
+
+        .form-actions {
+            grid-column: 1 / -1;
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            justify-content: flex-start;
+            flex-wrap: wrap;
+        }
+
+        .submit-btn {
+            border: none;
+            border-radius: 12px;
+            padding: 13px 18px;
+            font-weight: 800;
+            cursor: pointer;
+            color: white;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+            box-shadow: 0 14px 30px rgba(16, 185, 129, 0.22);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 18px 36px rgba(16, 185, 129, 0.28);
+        }
+
+        .form-note {
+            color: var(--text-light);
+            font-size: 13px;
+        }
+
         table {
             width: 100%;
             border-collapse: collapse;
@@ -999,6 +1207,60 @@ $health_overview = $conn->query("
                 <button class="export-btn" onclick="exportData()" title="Export Report">📥 Export Report</button>
             </div>
 
+            <?php if ($success): ?>
+                <div class="alert alert-success"><?php echo htmlspecialchars($success); ?></div>
+            <?php endif; ?>
+            <?php if ($error): ?>
+                <div class="alert alert-danger"><?php echo htmlspecialchars($error); ?></div>
+            <?php endif; ?>
+
+            <!-- QUICK ADD HEALTH RECORD PANEL -->
+            <div class="form-panel" id="addHealthForm">
+                <div class="form-panel-header">
+                    <div class="form-panel-title">Quick Add Health Record</div>
+                    <div class="form-panel-subtitle">Save a basic health record directly to the system.</div>
+                </div>
+
+                <form method="POST" class="patient-form" autocomplete="off">
+                    <input type="hidden" name="add_health_record" value="1">
+
+                    <div class="form-group">
+                        <label for="hr_student_id">Student</label>
+                        <select id="hr_student_id" name="student_id" required>
+                            <option value="">Select student</option>
+                            <?php if ($students && $students->num_rows > 0): while ($s = $students->fetch_assoc()): ?>
+                                <option value="<?php echo $s['id']; ?>"><?php echo htmlspecialchars($s['name']) . ' (' . $s['student_no'] . ')'; ?></option>
+                            <?php endwhile; endif; ?>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="blood_type">Blood Type</label>
+                        <input type="text" id="blood_type" name="blood_type" value="<?php echo htmlspecialchars($_POST['blood_type'] ?? ''); ?>">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="allergies">Allergies</label>
+                        <input type="text" id="allergies" name="allergies" value="<?php echo htmlspecialchars($_POST['allergies'] ?? ''); ?>">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="chronic_conditions">Chronic Conditions</label>
+                        <input type="text" id="chronic_conditions" name="chronic_conditions" value="<?php echo htmlspecialchars($_POST['chronic_conditions'] ?? ''); ?>">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="medications">Medications</label>
+                        <input type="text" id="medications" name="medications" value="<?php echo htmlspecialchars($_POST['medications'] ?? ''); ?>">
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="submit" class="submit-btn">Save Health Record</button>
+                        <span class="form-note">Adds a minimal health record; edit details in Health Records page.</span>
+                    </div>
+                </form>
+            </div>
+
             <!-- KEY METRICS -->
             <div class="stats-grid">
                 <div class="stat-card success">
@@ -1037,6 +1299,10 @@ $health_overview = $conn->query("
                     <span class="action-icon">➕</span>
                     <span class="action-label">Log Visit</span>
                 </a>
+                <a href="#addPatientForm" class="action-card">
+                    <span class="action-icon">🩺</span>
+                    <span class="action-label">Add Patient</span>
+                </a>
                 <a href="../pages/staff_health_records.php" class="action-card">
                     <span class="action-icon">📝</span>
                     <span class="action-label">Update Record</span>
@@ -1049,6 +1315,42 @@ $health_overview = $conn->query("
                     <span class="action-icon">📊</span>
                     <span class="action-label">View Reports</span>
                 </a>
+            </div>
+
+            <div class="form-panel" id="addPatientForm">
+                <div class="form-panel-header">
+                    <div class="form-panel-title">Add Student / Patient</div>
+                    <div class="form-panel-subtitle">Saved directly to the students table so the dashboard, patients list, and reports update automatically.</div>
+                </div>
+
+                <form method="POST" class="patient-form" autocomplete="off">
+                    <input type="hidden" name="add_patient" value="1">
+
+                    <div class="form-group">
+                        <label for="student_no">Student Number</label>
+                        <input type="text" id="student_no" name="student_no" value="<?php echo htmlspecialchars($_POST['student_no'] ?? ''); ?>" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="name">Full Name</label>
+                        <input type="text" id="name" name="name" value="<?php echo htmlspecialchars($_POST['name'] ?? ''); ?>" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="course">Course</label>
+                        <input type="text" id="course" name="course" value="<?php echo htmlspecialchars($_POST['course'] ?? ''); ?>" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="age">Age</label>
+                        <input type="number" id="age" name="age" min="1" max="100" value="<?php echo htmlspecialchars($_POST['age'] ?? ''); ?>" required>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="submit" class="submit-btn">Save Patient</button>
+                        <span class="form-note">New entries appear immediately in the recent patients table and total patient count.</span>
+                    </div>
+                </form>
             </div>
 
             <!-- RECENT VISITS -->

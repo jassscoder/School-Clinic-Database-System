@@ -4,6 +4,9 @@
  * Professional Centered Portal Design
  */
 header('Content-Type: text/html; charset=utf-8');
+header('Cache-Control: no-cache, no-store, must-revalidate, max-age=0');
+header('Pragma: no-cache');
+header('Expires: 0');
 
 // Enable error reporting for debugging
 error_reporting(E_ALL);

@@ -920,7 +920,7 @@ $health_alerts = $conn->query("
                     <span class="action-icon">📝</span>
                     <span class="action-label">Record Vitals</span>
                 </a>
-                <a href="../pages/nurse_patients.php" class="action-card">
+                <a href="../pages/nurse_patients.php#addPatientForm" class="action-card">
                     <span class="action-icon">👤</span>
                     <span class="action-label">Add Patient</span>
                 </a>

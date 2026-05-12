@@ -39,7 +39,7 @@ echo Waiting for services to fully start...
 timeout /t 2 /nobreak
 
 echo Opening browser...
-start "" "http://localhost/schord/check_db.php"
+start "" "http://localhost/schord/utils/check_db.php"
 
 echo.
 echo ╔════════════════════════════════════════════════════════════╗

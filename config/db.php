@@ -212,11 +212,27 @@ function requireLogin() {
     }
     
     if (!isset($_SESSION['user'])) {
-        // Use an absolute path so redirects work from any subfolder (e.g. /dashboards, /pages).
-        if (!headers_sent()) {
-            header("Location: /auth/login.php");
+        // Build login path that works both in subfolder deployments (/schord) and web-root deployments.
+        $scriptDir = str_replace('\\', '/', dirname($_SERVER['SCRIPT_NAME'] ?? '/'));
+        $lastSegment = strtolower(basename($scriptDir));
+        $knownAppSubdirs = ['dashboards', 'pages', 'auth', 'utils', 'config', 'includes'];
+
+        if (in_array($lastSegment, $knownAppSubdirs, true)) {
+            $basePath = str_replace('\\', '/', dirname($scriptDir));
         } else {
-            echo '<script>window.location.href="/auth/login.php";</script>';
+            $basePath = $scriptDir;
+        }
+
+        if ($basePath === '\\' || $basePath === '.' || $basePath === '/') {
+            $basePath = '';
+        }
+
+        $loginPath = ($basePath === '' ? '' : rtrim($basePath, '/')) . '/auth/login.php';
+
+        if (!headers_sent()) {
+            header("Location: " . $loginPath);
+        } else {
+            echo '<script>window.location.href="' . htmlspecialchars($loginPath, ENT_QUOTES, 'UTF-8') . '";</script>';
         }
         exit();
     }

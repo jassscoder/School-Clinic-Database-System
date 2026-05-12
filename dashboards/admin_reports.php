@@ -39,12 +39,21 @@ $complaints = $conn->query("SELECT complaint, COUNT(*) as count FROM clinic_visi
             --text-dark: #1e293b;
             --bg-card: #ffffff;
             --border-color: #e2e8f0;
+            --page-bg: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 50%, #fef3f2 100%);
+            --table-hover: #f9fafb;
         }
         body {
             font-family: 'Inter', 'Segoe UI', system-ui, sans-serif;
-            background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 50%, #fef3f2 100%);
+            background: var(--page-bg);
             color: var(--text-dark);
             min-height: 100vh;
+        }
+        body.dark-mode {
+            --text-dark: #e2e8f0;
+            --bg-card: #0f172a;
+            --border-color: #334155;
+            --page-bg: linear-gradient(135deg, #020617 0%, #0f172a 50%, #111827 100%);
+            --table-hover: #1e293b;
         }
         .container { max-width: 1200px; margin: 0 auto; padding: 30px 20px; }
         .header { margin-bottom: 30px; }
@@ -63,6 +72,10 @@ $complaints = $conn->query("SELECT complaint, COUNT(*) as count FROM clinic_visi
             box-shadow: 0 4px 12px rgba(0,0,0,0.08);
             border-left: 5px solid var(--primary);
         }
+        body.dark-mode .stat-card,
+        body.dark-mode .section {
+            box-shadow: 0 12px 24px rgba(0,0,0,0.25);
+        }
         .stat-card h3 { font-size: 12px; color: var(--text-dark); text-transform: uppercase; margin-bottom: 10px; opacity: 0.8; }
         .stat-card .value { font-size: 36px; font-weight: 800; color: var(--primary); }
         .section { background: var(--bg-card); padding: 25px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); margin-bottom: 30px; }
@@ -70,7 +83,7 @@ $complaints = $conn->query("SELECT complaint, COUNT(*) as count FROM clinic_visi
         table { width: 100%; border-collapse: collapse; }
         th { background: linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(236, 72, 153, 0.05)); padding: 12px; text-align: left; font-weight: 700; border-bottom: 2px solid var(--border-color); }
         td { padding: 12px; border-bottom: 1px solid var(--border-color); }
-        tbody tr:hover { background: #f9fafb; }
+        tbody tr:hover { background: var(--table-hover); }
     </style>
 </head>
 <body>
@@ -111,8 +124,8 @@ $complaints = $conn->query("SELECT complaint, COUNT(*) as count FROM clinic_visi
                 <tbody>
                     <?php 
                     $comp_count = 0;
-                    if ($complaints && $complaints->num_rows > 0): 
-                        while (($c = $complaints->fetch_assoc()) && $comp_count < 10):
+                        if ($complaints && $complaints->num_rows > 0): 
+                            while ($comp_count < 10 && ($c = $complaints->fetch_assoc())):
                             $comp_count++;
                     ?>
                         <tr>
@@ -129,5 +142,10 @@ $complaints = $conn->query("SELECT complaint, COUNT(*) as count FROM clinic_visi
             </table>
         </div>
     </div>
+    <script>
+        if (localStorage.getItem('theme') === 'dark') {
+            document.body.classList.add('dark-mode');
+        }
+    </script>
 </body>
 </html>

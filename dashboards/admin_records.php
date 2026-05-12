@@ -345,7 +345,7 @@ $total_records = $conn->query("SELECT COUNT(*) as count FROM health_records")->f
                                 <td><?php echo isset($record['created_at']) ? date('M d, Y', strtotime($record['created_at'])) : 'N/A'; ?></td>
                                 <td>
                                     <div class="action-buttons">
-                                        <a href="#" class="btn btn-primary btn-sm">View</a>
+                                        <a href="admin_view_record.php?id=<?php echo $record['id']; ?>" class="btn btn-primary btn-sm">View</a>
                                         <a href="?delete=<?php echo $record['id']; ?>" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure?')">Delete</a>
                                     </div>
                                 </td>

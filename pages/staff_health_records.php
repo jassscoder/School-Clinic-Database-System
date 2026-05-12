@@ -96,6 +96,7 @@ $students = $conn->query("SELECT id, name, student_no FROM students ORDER BY nam
             --primary: #10b981;
             --primary-light: #34d399;
             --primary-dark: #059669;
+            --secondary: #6ee7b7;
             --accent: #6ee7b7;
             --accent-light: #a7f3d0;
             --success: #10b981;
@@ -675,9 +676,20 @@ $students = $conn->query("SELECT id, name, student_no FROM students ORDER BY nam
             border-radius: 8px;
             font-weight: 600;
             cursor: pointer;
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            background: linear-gradient(135deg, var(--primary), var(--primary-light));
             color: white;
         }
+
+        /* Ensure the form save button is visible and aligned */
+        .form-card .btn {
+            display: inline-block;
+            float: right;
+            margin-top: 12px;
+            box-shadow: 0 8px 24px rgba(16,185,129,0.18);
+        }
+
+        /* Provide extra bottom padding so fixed layouts don't hide the button */
+        .form-card { padding-bottom: 48px; }
 
         .btn:hover {
             transform: translateY(-2px);
